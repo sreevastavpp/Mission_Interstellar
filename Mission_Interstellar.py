@@ -67,6 +67,20 @@ class Explosion(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect)
         pygame.display.update()
 
+    def update(self):
+        self.image = self.images[self.index]
+        screen.blit(self.image, self.rect)
+        pygame.display.update()
+        print("self.index")
+        print(self.index)
+        print("len(self.images)")
+        print(len(self.images))
+        if self.index + 1 >= len(self.images):
+            self.index = 0
+        else:
+            self.index += 1
+
+
 
 class Player(pygame.sprite.Sprite):
 

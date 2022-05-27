@@ -35,6 +35,36 @@ def load_image(file, size_x=-1, size_y=-1, colorkey=None):
     return image, image.get_rect()
 
 
+class stars:
+
+    def __init__(self, radius, color, nofstars, speed=5):
+        self.radius = radius
+        self.color = color
+        self.speed = speed
+        self.nofstars = nofstars
+        self.starpos = [[0 for j in range(2)] for i in range(self.nofstars)]
+        for x in range(self.nofstars):
+            self.starpos[x][0] = random.randrange(0, width)
+            self.starpos[x][1] = random.randrange(0, height)
+
+    def drawstars(self):
+        for x in range(self.nofstars):
+            pygame.draw.circle(screen, self.color, (self.starpos[x][0], self.starpos[x][1]), self.radius)
+        self.movestars()
+
+    def movestars(self):
+        for x in range(self.nofstars):
+            self.starpos[x] -= speed_vec
+            if self.starpos[x][0] > width:
+                self.starpos[x][0] = 0
+            if self.starpos[x][0] < 0:
+                self.starpos[x][0] = width
+            if self.starpos[x][1] > height:
+                self.starpos[x][1] = 0
+            if self.starpos[x][1] < 0:
+                self.starpos[x][1] = height
+
+
 class Explosion(pygame.sprite.Sprite):
 
     def __init__(self, x, y, radius=-1):

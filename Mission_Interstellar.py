@@ -34,6 +34,40 @@ def load_image(file, size_x=-1, size_y=-1, colorkey=None):
 
     return image, image.get_rect()
 
+
+class Explosion(pygame.sprite.Sprite):
+
+    def __init__(self, x, y, radius=-1):
+        pygame.sprite.Sprite.__init__(self)
+        sheet = pygame.image.load('Sprites/enemy_explode.png')
+        self.images = []
+        for i in range(0, 768, 48):
+            rect = pygame.Rect((i, 0, 48, 48))
+            image = pygame.Surface(rect.size)
+            image = image.convert()
+            colorkey = image.get_at((10, 10))
+            image.set_colorkey(colorkey, RLEACCEL)
+
+            image.blit(sheet, (0, 0), rect)
+            if radius != -1:
+                image = pygame.transform.scale(image, (radius, radius))
+
+            self.images.append(image)
+
+
+        print("len(self.images)")
+        print(len(self.images))
+
+        self.image = self.images[0]
+        self.index = 0
+        print("self.index")
+        print(self.index)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        screen.blit(self.image, self.rect)
+        pygame.display.update()
+
+
 class Player(pygame.sprite.Sprite):
 
     def __init__(self, pos):

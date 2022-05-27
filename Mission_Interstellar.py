@@ -1,16 +1,26 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+import os
+import pygame
+import sys
+import time
+import math
+import random
+from pygame.locals import *
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+pygame.init()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+pygame.display.set_caption('Mission Interstellar')
+
+size = (width, height) = (1024, 768)
+screen = pygame.display.set_mode(size, DOUBLEBUF | FULLSCREEN)
+clock = pygame.time.Clock()
+
+running = True
+
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    pygame.display.update()
+    clock.tick(60)

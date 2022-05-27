@@ -289,6 +289,34 @@ class Player(pygame.sprite.Sprite):
         if self.fuel > self.maxfuel:
             self.fuel = self.maxfuel
 
+class flame(pygame.sprite.Sprite):
+
+    def __init__(self, width, length, user, direction):
+        pygame.sprite.Sprite.__init__(self)
+
+        if direction == 1:
+            (self.image, self.rect) = load_image('flame_up.png', width, length, -1)
+        elif direction == 2:
+            (self.image, self.rect) = load_image('flame_right.png', width, length, -1)
+        elif direction == 3:
+            (self.image, self.rect) = load_image('flame_left.png', width, length, -1)
+        elif direction == 4:
+            (self.image, self.rect) = load_image('flame_down.png', width, length, -1)
+
+        self.original_image = self.image
+        self.rect = self.image.get_rect(center=self.rect.center)
+        self.rect.center = user.rect.center
+
+    def update(self, user):
+        self.rect = self.image.get_rect(center=self.rect.center)
+        self.rect.center = user.rect.center
+        self.image = pygame.transform.rotate(self.original_image, -user.angle)
+        screen.blit(self.image, self.rect)
+
+    def kill(self):
+        self.kill()
+
+
 player = Player(screen.get_rect().center)
 
 while running:

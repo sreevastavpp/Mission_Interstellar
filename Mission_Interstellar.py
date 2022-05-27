@@ -349,10 +349,58 @@ class flame(pygame.sprite.Sprite):
 
 player = Player(screen.get_rect().center)
 
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
 
-    pygame.display.update()
-    clock.tick(60)
+def main_menu():
+    print("Mainmenu")
+    color_selected = blue
+    color_normal = white
+    starfield1 = stars(1, (150, 150, 150), 75, 0.5)
+    starfield2 = stars(1, (75, 75, 75), 200, 1)
+    global mainmenu
+    global submenu
+    global settingsmenu
+    global howtoplaymenu
+    global running
+    global speed_vec
+    selected = 0
+    while mainmenu:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    selected -= 1
+                elif event.key == pygame.K_DOWN:
+                    selected += 1
+
+                if event.key == pygame.K_RETURN:
+                    if selected == 0:
+                        mainmenu = False
+                        submenu = True
+                        level_menu()
+                    if selected == 1:
+                        mainmenu = False
+                        settingsmenu = True
+                        settings()
+                    if selected == 2:
+                        mainmenu = False
+                        howtoplaymenu = True
+                        howtoplay()
+                    if selected == 3:
+                        pygame.quit()
+                        quit()
+
+        screen.fill((0, 0, 0))
+        displaytext('Play', 32, width / 2 - 20, height - 400, blue)
+        displaytext('Options', 32, width / 2 - 20, height - 300, white)
+        displaytext('How To Play', 32, width / 2 - 20, height - 200, white)
+        displaytext('Exit', 32, width / 2 - 20, height - 100, white)
+
+        speed_vec = vec(0, -1)
+        starfield1.drawstars()
+        starfield2.drawstars()
+        pygame.display.update()
+        clock.tick(60)
+
+main_menu()

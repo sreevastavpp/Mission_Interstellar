@@ -611,6 +611,94 @@ def game_over():
         pygame.display.update()
         clock.tick(60)
 
+def lvl_finished():
+    color1 = blue
+    color2 = white
+
+    starfield1 = stars(1, (150, 150, 150), 75, 0.5)
+    starfield2 = stars(1, (75, 75, 75), 200, 1)
+
+    global mainmenu
+    global running
+    global speed_vec
+    global currentLvl
+    global lvlfinishmenu
+    selected = 0
+
+    while lvlfinishmenu:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    selected -= 1
+                elif event.key == pygame.K_RIGHT:
+                    selected += 1
+                elif event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
+                    mainmenu = True
+                    lvlfinishmenu = False
+                    main_menu()
+
+                if event.key == pygame.K_RETURN:
+                    if selected == 0:
+                        lvlfinishmenu = False
+                        running = True
+                        # player.gameOver = False
+                        currentLvl += 1
+                        play_lvl()
+                    if selected == 1:
+                        mainmenu = True
+                        lvlfinishmenu = False
+                        main_menu()
+
+        screen.fill((0, 0, 0))
+        if selected > 1:
+            selected = 0
+        if selected < 0:
+            selected = 1
+
+        if (selected == 0):
+            color1 = blue
+            color2 = white
+        elif (selected == 1):
+            color1 = white
+            color2 = blue
+
+        displaytext('Level Complete', 64, width / 2, 100, white)
+        displaytext('Next Level', 32, width / 3 - 20, height - 400, color1)
+        displaytext('Main Menu', 32, 2 * width / 3 + 20, height - 400, color2)
+        displaytext('Mission Intersteller 1.0', 12, width - 80, height - 40,
+                    white)
+        displaytext('Made by: Vatsal Patel', 12, width - 80, height - 20,
+                    white)
+
+        speed_vec = vec(0, -1)
+        starfield1.drawstars()
+        starfield2.drawstars()
+        pygame.display.update()
+        clock.tick(60)
+
+
+def play_lvl():
+    global currentLvl
+
+    if currentLvl > 4:
+        currentLvl = 0
+    if currentLvl < 0:
+        currentLvl = 4
+
+    if currentLvl == 0:
+        level_1()
+    elif currentLvl == 1:
+        level_2()
+    elif currentLvl == 2:
+        level_3()
+    elif currentLvl == 3:
+        level_4()
+    elif currentLvl == 4:
+        level_5()
+
 
 
 main_menu()

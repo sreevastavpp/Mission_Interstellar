@@ -34,6 +34,19 @@ def load_image(file, size_x=-1, size_y=-1, colorkey=None):
 
     return image, image.get_rect()
 
+def displaytext(
+        text,
+        fontsize,
+        x,
+        y,
+        color,
+):
+    font = pygame.font.SysFont('sawasdee', fontsize, True)
+    text = font.render(text, 1, color)
+    textpos = text.get_rect(centerx=x, centery=y)
+    screen.blit(text, textpos)
+    return text
+
 
 class stars:
 

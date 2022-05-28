@@ -397,12 +397,53 @@ def main_menu():
         displaytext('How To Play', 32, width / 2 - 20, height - 200, white)
         displaytext('Exit', 32, width / 2 - 20, height - 100, white)
 
+        if selected > 3:
+            selected = 0
+        if selected < 0:
+            selected = 3
+
+        if (selected == 0):
+            displaytext('Play', 32, width / 2 - 20, height - 400,
+                        color_selected)
+            displaytext('Options', 32, width / 2 - 20, height - 300,
+                        color_normal)
+            displaytext('How To Play', 32, width / 2 - 20, height - 200,
+                        color_normal)
+            displaytext('Exit', 32, width / 2 - 20, height - 100, color_normal)
+        elif (selected == 1):
+            displaytext('Play', 32, width / 2 - 20, height - 400, color_normal)
+            displaytext('Options', 32, width / 2 - 20, height - 300,
+                        color_selected)
+            displaytext('How To Play', 32, width / 2 - 20, height - 200,
+                        color_normal)
+            displaytext('Exit', 32, width / 2 - 20, height - 100, color_normal)
+        elif (selected == 2):
+            displaytext('Play', 32, width / 2 - 20, height - 400, color_normal)
+            displaytext('Options', 32, width / 2 - 20, height - 300,
+                        color_normal)
+            displaytext('How To Play', 32, width / 2 - 20, height - 200,
+                        color_selected)
+            displaytext('Exit', 32, width / 2 - 20, height - 100, color_normal)
+        elif (selected == 3):
+            displaytext('Play', 32, width / 2 - 20, height - 400, color_normal)
+            displaytext('Options', 32, width / 2 - 20, height - 300,
+                        color_normal)
+            displaytext('How To Play', 32, width / 2 - 20, height - 200,
+                        color_normal)
+            displaytext('Exit', 32, width / 2 - 20, height - 100,
+                        color_selected)
+
+        displaytext('Mission Intersteller 1.0', 12, width - 80, height - 20,
+                    white)
+        displaytext('Made by: Vatsal Patel', 12, width - 80, height - 10,
+                    white)
         speed_vec = vec(0, -1)
         starfield1.drawstars()
         starfield2.drawstars()
         pygame.display.update()
         clock.tick(60)
 
+        
 def level_menu():
     print("Submenu")
     color1 = blue

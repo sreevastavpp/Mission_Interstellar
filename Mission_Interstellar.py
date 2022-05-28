@@ -443,7 +443,7 @@ def main_menu():
         pygame.display.update()
         clock.tick(60)
 
-        
+
 def level_menu():
     print("Submenu")
     color1 = blue
@@ -543,6 +543,74 @@ def level_menu():
         starfield2.drawstars()
         pygame.display.update()
         clock.tick(60)
+
+def game_over():
+    color1 = blue
+    color2 = white
+
+    starfield1 = stars(1, (150, 150, 150), 75, 0.5)
+    starfield2 = stars(1, (75, 75, 75), 200, 1)
+
+    global mainmenu
+    global running
+    global speed_vec
+    global currentLvl
+    global gameovermenu
+    selected = 0
+
+    while gameovermenu:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    selected -= 1
+                elif event.key == pygame.K_RIGHT:
+                    selected += 1
+                elif event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
+                    mainmenu = True
+                    gameovermenu = False
+                    main_menu()
+
+                if event.key == pygame.K_RETURN:
+                    if selected == 0:
+                        gameovermenu = False
+                        running = True
+                        # player.gameOver = False
+                        play_lvl()
+                    if selected == 1:
+                        mainmenu = True
+                        gameovermenu = False
+                        main_menu()
+
+        screen.fill((0, 0, 0))
+        if selected > 1:
+            selected = 0
+        if selected < 0:
+            selected = 1
+
+        if (selected == 0):
+            color1 = blue
+            color2 = white
+        elif (selected == 1):
+            color1 = white
+            color2 = blue
+
+        displaytext('Game Over', 64, width / 2, 100, white)
+        displaytext('Play Again', 32, width / 3 - 20, height - 400, color1)
+        displaytext('Main Menu', 32, 2 * width / 3 + 20, height - 400, color2)
+        displaytext('Mission Intersteller 1.0', 12, width - 80, height - 40,
+                    white)
+        displaytext('Made by: Vatsal Patel', 12, width - 80, height - 20,
+                    white)
+
+        speed_vec = vec(0, -1)
+        starfield1.drawstars()
+        starfield2.drawstars()
+        pygame.display.update()
+        clock.tick(60)
+
 
 
 main_menu()

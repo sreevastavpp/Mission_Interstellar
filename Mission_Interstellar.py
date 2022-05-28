@@ -403,4 +403,105 @@ def main_menu():
         pygame.display.update()
         clock.tick(60)
 
+def level_menu():
+    print("Submenu")
+    color1 = blue
+    color2 = white
+    color3 = white
+    color4 = white
+    color5 = white
+
+    starfield1 = stars(1, (150, 150, 150), 75, 0.5)
+    starfield2 = stars(1, (75, 75, 75), 200, 1)
+
+    global mainmenu
+    global submenu
+    global running
+    global speed_vec
+    global currentLvl
+    selected = 0
+    while submenu:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    selected -= 1
+                elif event.key == pygame.K_DOWN:
+                    selected += 1
+                elif event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
+                    mainmenu = True
+                    submenu = False
+                    main_menu()
+
+                if event.key == pygame.K_RETURN:
+                    submenu = False
+                    running = True
+                    currentLvl = selected
+                    if selected == 0:
+                        level_1()
+                    if selected == 1:
+                        level_2()
+                    if selected == 2:
+                        level_3()
+                    if selected == 3:
+                        level_4()
+                    if selected == 4:
+                        level_5()
+
+        screen.fill((0, 0, 0))
+        if selected > 4:
+            selected = 0
+        if selected < 0:
+            selected = 4
+
+        if (selected == 0):
+            color1 = blue
+            color2 = white
+            color3 = white
+            color4 = white
+            color5 = white
+        elif (selected == 1):
+            color1 = white
+            color2 = blue
+            color3 = white
+            color4 = white
+            color5 = white
+        elif (selected == 2):
+            color1 = white
+            color2 = white
+            color3 = blue
+            color4 = white
+            color5 = white
+        elif (selected == 3):
+            color1 = white
+            color2 = white
+            color3 = white
+            color4 = blue
+            color5 = white
+        elif (selected == 4):
+            color1 = white
+            color2 = white
+            color3 = white
+            color4 = white
+            color5 = blue
+
+        displaytext('Level 1', 32, width / 2 - 20, height - 500, color1)
+        displaytext('Level 2', 32, width / 2 - 20, height - 450, color2)
+        displaytext('Level 3', 32, width / 2 - 20, height - 400, color3)
+        displaytext('Level 4', 32, width / 2 - 20, height - 350, color4)
+        displaytext('Level 5', 32, width / 2 - 20, height - 300, color5)
+        displaytext('Mission Intersteller 1.0', 12, width - 80, height - 20,
+                    white)
+        displaytext('Made by: Vatsal Patel', 12, width - 80, height - 10,
+                    white)
+
+        speed_vec = vec(0, -1)
+        starfield1.drawstars()
+        starfield2.drawstars()
+        pygame.display.update()
+        clock.tick(60)
+
+
 main_menu()

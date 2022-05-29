@@ -123,7 +123,31 @@ class Explosion(pygame.sprite.Sprite):
         else:
             self.index += 1
 
+class Planets(pygame.sprite.Sprite):
 
+    def __init__(self, radius, pos, target=False, translate=False):
+        pygame.sprite.Sprite.__init__(self)
+
+        if target:
+            (self.image, self.rect) = load_image("target_planet.png", radius,
+                                                 radius, -1)
+
+        else:
+            files = [f for f in listdir("Sprites/Planets") if
+                     isfile(join("Sprites/Planets", f))]
+
+            file = files[random.randrange(0, len(files))]
+
+            (self.image, self.rect) = load_image(join("Planets", file), radius,
+                                                 radius, -1)
+
+        self.rect.center = pos
+        self.radius = radius
+        self.vicinity_rect = self.rect.inflate(radius * NORMAL_GRAVITY,
+                                               radius * NORMAL_GRAVITY)
+        self.vicinity_rect.center = self.rect.center
+        self.pos = vec(self.rect.centerx, self.rect.centery)
+        self.translate = translate
 
 class Player(pygame.sprite.Sprite):
 

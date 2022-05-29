@@ -169,6 +169,34 @@ class Planets(pygame.sprite.Sprite):
         # pygame.draw.circle(self.image, self.color, (self.planepos[0], self.planepos[1]), self.radius)
         screen.blit(self.image, self.rect)
 
+class BlackHole(pygame.sprite.Sprite):
+
+    def __init__(self, pos, radius, translate=False):
+        pygame.sprite.Sprite.__init__(self)
+
+        (self.image, self.rect) = load_image('blackhole.png', radius,
+                                             radius * 0.45, -1)
+
+        self.rect.center = pos
+        self.pos = vec(pos)
+        self.radius = radius
+        self.vicinity_rect = self.rect.inflate(radius * 1.5, radius * 1.5)
+        self.vicinity_rect.center = self.rect.center
+        self.rect2 = self.rect
+        self.rect2.width += 20
+        self.rect2.height += 20
+        self.rect2.center = self.rect.center
+        self.translate = translate
+
+    def update(self):
+        if self.translate:
+            self.pos -= speed_vec
+            self.rect.center = self.pos
+            self.vicinity_rect.center = self.rect.center
+            self.rect2.center = self.rect.center
+
+        screen.blit(self.image, self.rect)
+
 class Player(pygame.sprite.Sprite):
 
     def __init__(self, pos):

@@ -149,6 +149,26 @@ class Planets(pygame.sprite.Sprite):
         self.pos = vec(self.rect.centerx, self.rect.centery)
         self.translate = translate
 
+    def update(self):
+        if self.translate:
+            self.pos -= speed_vec
+            self.rect.center = self.pos
+            self.vicinity_rect.center = self.rect.center
+
+        screen.blit(self.image, self.rect)
+        # if self.starpos[x][0] > width:
+        #     self.starpos[x][0] = 0
+        # if self.starpos[x][0] < 0:
+        #     self.starpos[x][0] = width
+        # if self.starpos[x][1] > height:
+        #     self.starpos[x][1] = 0
+        # if self.starpos[x][1] < 0:
+        #     self.starpos[x][1] = height
+
+    def drawplanets(self):
+        # pygame.draw.circle(self.image, self.color, (self.planepos[0], self.planepos[1]), self.radius)
+        screen.blit(self.image, self.rect)
+
 class Player(pygame.sprite.Sprite):
 
     def __init__(self, pos):

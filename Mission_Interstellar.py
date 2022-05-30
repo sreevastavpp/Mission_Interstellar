@@ -197,6 +197,50 @@ class BlackHole(pygame.sprite.Sprite):
 
         screen.blit(self.image, self.rect)
 
+
+class Asteroid(pygame.sprite.Sprite):
+
+    def __init__(self, pos, radius, rot_radius, offset, sign, angle_speed,
+                 *groups, translate=False):
+        super().__init__(*groups)
+        files = [f for f in listdir("Sprites/Asteroids") if
+                 isfile(join("Sprites/Asteroids", f))]
+
+        file = files[random.randrange(0, len(files))]
+
+        (self.image, self.rect) = load_image(join("Asteroids", file), radius,
+                                             radius, -1)
+
+        # self.rect = self.image.get_rect()
+        self.rect.center = pos
+        self.pos = vec(pos)
+        self.sign = sign
+        if (self.sign == "-"):
+            self.offset = vec(-rot_radius, offset)
+        else:
+            self.offset = vec(rot_radius, offset)
+        self.angle = 0
+        self.angle_speed = angle_speed
+        self.translate = translate
+        # self.angle_speed = random.randrange(2, 8)/10
+
+    def update(self):
+        if self.translate:
+            self.pos -= speed_vec
+            self.rect.center = self.pos
+
+        if self.sign == "-":
+            self.angle -= self.angle_speed
+        else:
+            self.angle += self.angle_speed
+        self.rect.center = self.pos + self.offset.rotate(self.angle)
+
+        screen.blit(self.image, self.rect)
+
+    def destroy(self):
+        self.kill()
+
+
 class Player(pygame.sprite.Sprite):
 
     def __init__(self, pos):

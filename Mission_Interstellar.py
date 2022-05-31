@@ -240,6 +240,39 @@ class Asteroid(pygame.sprite.Sprite):
     def destroy(self):
         self.kill()
 
+class Meteor(pygame.sprite.Sprite):
+
+    def __init__(self, pos, radius, speed):
+        pygame.sprite.Sprite.__init__(self)
+        files = [f for f in listdir("Sprites/Meteors") if
+                 isfile(join("Sprites/Meteors", f))]
+
+        file = files[random.randrange(0, len(files))]
+
+        (self.image, self.rect) = load_image(join("Meteors", file), radius,
+                                             radius, -1)
+
+        self.rect = self.image.get_rect(center=pos)
+        self.pos = vec(pos)
+        self.speed = speed
+        self.explosion_sound = pygame.mixer.Sound('Sprites/explosion.wav')
+        self.explosion_sound.set_volume(0.1)
+        self.initial_pos = pos
+
+    def draw(self):
+        screen.blit(self.image, self.rect)
+
+    def update(self):
+        screen.blit(self.image, self.rect)
+        self.pos += self.speed
+        self.rect.center = self.pos
+        if self.rect.left > screen.get_width():
+            self.kill()
+        if self.rect.top > screen.get_height():
+            self.kill()
+        # if self.rect.top < 100 and self.rect.top>0:
+        #    self.meteor_sound.play()
+
 
 class Player(pygame.sprite.Sprite):
 

@@ -273,6 +273,22 @@ class Meteor(pygame.sprite.Sprite):
         # if self.rect.top < 100 and self.rect.top>0:
         #    self.meteor_sound.play()
 
+    def recenter(self):
+        self.pos = self.initial_pos
+        self.rect.center = self.pos
+
+    def destroy(self):
+        (x, y) = self.rect.center
+        if pygame.mixer.get_init():
+            self.explosion_sound.play(maxtime=1000)
+
+        self.explosion = Explosion(x, y, 60)
+        for i in range(0, 30):
+            self.explosion.update()
+
+        self.kill()
+        self.explosion.kill()
+
 
 class Player(pygame.sprite.Sprite):
 

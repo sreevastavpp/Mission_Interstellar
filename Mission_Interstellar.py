@@ -290,6 +290,30 @@ class Meteor(pygame.sprite.Sprite):
         self.explosion.kill()
 
 
+class WormHole(pygame.sprite.Sprite):
+
+    def __init__(self, pos, angle, radius, translate=False):
+        pygame.sprite.Sprite.__init__(self)
+
+        (self.original_image, self.rect) = load_image('wormhole.jpg', radius,
+                                                      radius * 0.45, white)
+
+        self.image = pygame.transform.rotate(self.original_image, -angle)
+        self.rect = self.image.get_rect(center=self.rect.center)
+        self.rect.center = pos
+        self.radius = radius
+        self.angle = angle
+        self.pos = vec(pos)
+        self.translate = translate
+
+    def update(self):
+        if self.translate:
+            self.pos -= speed_vec
+            self.rect.center = self.pos
+
+        screen.blit(self.image, self.rect)
+
+
 class Player(pygame.sprite.Sprite):
 
     def __init__(self, pos):

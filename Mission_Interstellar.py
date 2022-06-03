@@ -244,15 +244,13 @@ class Meteor(pygame.sprite.Sprite):
 
     def __init__(self, pos, radius, speed):
         pygame.sprite.Sprite.__init__(self)
-        files = [f for f in listdir("Sprites/Meteors") if
-                 isfile(join("Sprites/Meteors", f))]
 
-        file = files[random.randrange(0, len(files))]
-
-        (self.image, self.rect) = load_image(join("Meteors", file), radius,
-                                             radius, -1)
-
-        self.rect = self.image.get_rect(center=pos)
+        (self.image, self.rect) = load_image('Meteors/meteor.png', radius*0.7,
+                                             2*radius, -1)
+        self.original_image = self.image
+        self.angle = round(math.atan2(speed.x, speed.y)/math.pi*180)
+        self.image = pygame.transform.rotate(self.original_image, self.angle)
+        self.rect = self.image.get_rect(center=self.rect.center)
         self.pos = vec(pos)
         self.speed = speed
         self.explosion_sound = pygame.mixer.Sound('Sprites/explosion.wav')
@@ -273,6 +271,7 @@ class Meteor(pygame.sprite.Sprite):
         # if self.rect.top < 100 and self.rect.top>0:
         #    self.meteor_sound.play()
 
+
     def recenter(self):
         self.pos = self.initial_pos
         self.rect.center = self.pos
@@ -288,7 +287,6 @@ class Meteor(pygame.sprite.Sprite):
 
         self.kill()
         self.explosion.kill()
-
 
 class WormHole(pygame.sprite.Sprite):
 

@@ -744,6 +744,157 @@ def level_menu():
         pygame.display.update()
         clock.tick(60)
 
+def level_1():
+    global running
+    global gameovermenu
+    global lvlfinishmenu
+    global speed_vec
+
+    fuelbeep = False
+    showintro = True
+    player = Player((50, 50))
+    player.gameOver = False
+    player.angle_speed = 90
+    player.rotate()
+    player.fuel = 50
+    player.maxfuel = 50
+    starfield1 = stars(1, (150, 150, 150), 75, 0.5)
+    starfield2 = stars(1, (75, 75, 75), 200, 1)
+    player.speed_vec = vec(0, 0)
+    speed_vec = vec(0, 0)
+
+    planetGroup = pygame.sprite.Group()
+
+    # planet1 = Planets(100, (400, 450))
+    planet2 = Planets(200, (100, 600))
+    planet3 = Planets(250, (600, 700))
+    planet4 = Planets(100, (300, 100))
+    planet5 = Planets(125, (800, 200))
+    target_planet = Planets(100, (1000, 500), True)
+
+    # planetGroup.add(planet1)
+    planetGroup.add(planet2)
+    planetGroup.add(planet3)
+    planetGroup.add(planet4)
+    planetGroup.add(planet5)
+
+    playerGroup = pygame.sprite.Group()
+    playerGroup.add(player)
+
+    # fuelpack1 = Fuelpack((200, 600))
+    # fuelpack2 = Fuelpack((500, 100))
+    # fuelpack3 = Fuelpack((1000, 100))
+    # fuelpackGroup = pygame.sprite.Group()
+    # fuelpackGroup.add(fuelpack1)
+    # fuelpackGroup.add(fuelpack2)
+    # fuelpackGroup.add(fuelpack3)
+
+    while running and not player.gameOver:
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                running = False
+                gameovermenu = True
+                game_over()
+
+        # if pygame.sprite.collide_mask(player, planet1):
+        #     player.explode()
+        for planet in planetGroup:
+            if pygame.sprite.collide_mask(player, planet):
+                player.explode()
+        # if pygame.sprite.collide_mask(player, planet3):
+        #     player.explode()
+        # if pygame.sprite.collide_mask(player, planet4):
+        #     player.explode()
+        # if pygame.sprite.collide_mask(player, planet5):
+        #     player.explode()
+        if pygame.sprite.collide_mask(player, target_planet):
+            if player.vel.magnitude() > 1:
+                player.explode()
+            else:
+                thrust_on.stop()
+                lvl_complete_effect.play()
+                lvlfinishmenu = True
+                player.gameOver = True
+                lvl_finished()
+
+        # if pygame.sprite.collide_mask(player, fuelpack1):
+        #     fuelpack1.kill()
+        #     player.addFuel(5)
+        #
+        # if pygame.sprite.collide_mask(player, fuelpack2):
+        #     fuelpack2.kill()
+        #     player.addFuel(5)
+        #
+        # if pygame.sprite.collide_mask(player, fuelpack3):
+        #     fuelpack3.kill()
+        #     player.addFuel(5)
+
+        planet_collided_sprites = pygame.sprite.groupcollide(planetGroup,
+                                                             playerGroup,
+                                                             False, False,
+                                                             collided=vicinity_collision)
+
+        if len(planet_collided_sprites) != 0:
+            for planet in planet_collided_sprites:
+                player.gravity(planet, NORMAL_GRAVITY)
+
+        screen.fill((0, 0, 0))
+        starfield1.drawstars()
+        starfield2.drawstars()
+
+        planet2.update()
+        planet3.update()
+        planet4.update()
+        planet5.update()
+        target_planet.update()
+        # playerGroup.draw(screen)
+        # planetGroup.draw(screen)
+        # fuelpackGroup.draw(screen)
+        # planetGroup.update()
+        # playerGroup.update()
+        # fuelpack1.drawfuelpack()
+        # fuelpackGroup.update()
+        player.update()
+
+        if showintro:
+            pygame.display.update()
+            border = pygame.Rect((50, height - 100), (width - 100, 70))
+            textbox = pygame.Rect((50, height - 100), (width - 100, 70))
+            pygame.draw.rect(screen, black, textbox, border_radius=12)
+            pygame.draw.rect(screen, green, border, 2, border_radius=12)
+            pygame.display.update()
+            if setting_sound_effects:
+                intro_printing.play(-1)
+
+            displayanimtext('TARS:', (60, 42.5))
+            displayanimtext('Hello Captain Cooper. Earth is no more habitable, so you are directed to take the Endurance ship with 1000 frozen human embryos and reach the planet, Pandora.', (
+                100, 42.5))  # text string and x, y coordinate tuple.
+            displayanimtext('Our previous teams have landed there. You might find their spaceship. Are you ready to save humanity? ', (100, 43.5))
+            displayanimtext('Press ENTER to continue', (800, 44.5))
+            intro_printing.stop()
+
+            while showintro:
+                for event in pygame.event.get():
+                    if event.type == KEYDOWN:
+                        if event.key == K_RETURN:
+                            showintro = False
+                            # if setting_music:
+                                # bg_music.play(-1)
+
+        showfuelbar(player, [100, height - 20, player.fuel * (900/player.maxfuel), 10])
+
+
+        if player.fuel <= 0:
+            player.gameOver = True
+            gameovermenu = True
+            game_over()
+
+        pygame.display.flip()
+        clock.tick(60)
+
+
+
 def game_over():
     color1 = blue
     color2 = white

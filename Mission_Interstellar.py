@@ -765,14 +765,12 @@ def level_1():
 
     planetGroup = pygame.sprite.Group()
 
-    # planet1 = Planets(100, (400, 450))
     planet2 = Planets(200, (100, 600))
     planet3 = Planets(250, (600, 700))
     planet4 = Planets(100, (300, 100))
     planet5 = Planets(125, (800, 200))
     target_planet = Planets(100, (1000, 500), True)
 
-    # planetGroup.add(planet1)
     planetGroup.add(planet2)
     planetGroup.add(planet3)
     planetGroup.add(planet4)
@@ -780,14 +778,6 @@ def level_1():
 
     playerGroup = pygame.sprite.Group()
     playerGroup.add(player)
-
-    # fuelpack1 = Fuelpack((200, 600))
-    # fuelpack2 = Fuelpack((500, 100))
-    # fuelpack3 = Fuelpack((1000, 100))
-    # fuelpackGroup = pygame.sprite.Group()
-    # fuelpackGroup.add(fuelpack1)
-    # fuelpackGroup.add(fuelpack2)
-    # fuelpackGroup.add(fuelpack3)
 
     while running and not player.gameOver:
         for event in pygame.event.get():
@@ -797,17 +787,10 @@ def level_1():
                 gameovermenu = True
                 game_over()
 
-        # if pygame.sprite.collide_mask(player, planet1):
-        #     player.explode()
         for planet in planetGroup:
             if pygame.sprite.collide_mask(player, planet):
                 player.explode()
-        # if pygame.sprite.collide_mask(player, planet3):
-        #     player.explode()
-        # if pygame.sprite.collide_mask(player, planet4):
-        #     player.explode()
-        # if pygame.sprite.collide_mask(player, planet5):
-        #     player.explode()
+
         if pygame.sprite.collide_mask(player, target_planet):
             if player.vel.magnitude() > 1:
                 player.explode()
@@ -817,18 +800,6 @@ def level_1():
                 lvlfinishmenu = True
                 player.gameOver = True
                 lvl_finished()
-
-        # if pygame.sprite.collide_mask(player, fuelpack1):
-        #     fuelpack1.kill()
-        #     player.addFuel(5)
-        #
-        # if pygame.sprite.collide_mask(player, fuelpack2):
-        #     fuelpack2.kill()
-        #     player.addFuel(5)
-        #
-        # if pygame.sprite.collide_mask(player, fuelpack3):
-        #     fuelpack3.kill()
-        #     player.addFuel(5)
 
         planet_collided_sprites = pygame.sprite.groupcollide(planetGroup,
                                                              playerGroup,
@@ -843,18 +814,9 @@ def level_1():
         starfield1.drawstars()
         starfield2.drawstars()
 
-        planet2.update()
-        planet3.update()
-        planet4.update()
-        planet5.update()
+        planetGroup.update()
+        planetGroup.draw(screen)
         target_planet.update()
-        # playerGroup.draw(screen)
-        # planetGroup.draw(screen)
-        # fuelpackGroup.draw(screen)
-        # planetGroup.update()
-        # playerGroup.update()
-        # fuelpack1.drawfuelpack()
-        # fuelpackGroup.update()
         player.update()
 
         if showintro:
@@ -892,8 +854,6 @@ def level_1():
 
         pygame.display.flip()
         clock.tick(60)
-
-
 
 def game_over():
     color1 = blue

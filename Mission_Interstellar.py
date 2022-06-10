@@ -872,6 +872,235 @@ def createmeteorWave(num, posx):
     return meteors, mtg
 
 
+def level_2():
+    global running
+    global gameovermenu
+    global lvlfinishmenu
+    global speed_vec
+    showintro = True
+    player = Player((50, 50))
+    player.gameOver = False
+    player.angle_speed = 90
+    player.rotate()
+    player.fuel = 50
+    player.maxfuel = 50
+    starfield1 = stars(1, (150, 150, 150), 75, 0.5)
+    starfield2 = stars(1, (75, 75, 75), 200, 1)
+    player.speed_vec = vec(0, 0)
+    speed_vec = vec(0, 0)
+    start_time = None
+    timercount = 1
+    meteorWave = False
+    meteorWarning = False
+
+    meteors = []
+    meteorGroup = pygame.sprite.Group()
+
+    planetGroup = pygame.sprite.Group()
+
+    # planet1 = Planets(100, (400, 450))
+    planet2 = Planets(200, (250, 600))
+    planet3 = Planets(150, (650, 200))
+    planet4 = Planets(100, (250, 100))
+    planet5 = Planets(125, (600, 700))
+    target_planet = Planets(150, (900, 500), True)
+
+    # meteor1 = Meteor((100,10), 50, vec(1,1), meteorGroup)
+    # meteor2 = Meteor((200,20), 50, vec(1,1),meteorGroup)
+    # meteor3 = Meteor((400,30), 50, vec(1,1),meteorGroup)
+    # meteor4 = Meteor((500,40), 50, vec(1,1),meteorGroup)
+    # meteor5 = Meteor((700,50), 50, vec(1,1),meteorGroup)
+    # meteor6 = Meteor((700,50), 50, vec(1,1),meteorGroup)
+    # meteor7 = Meteor((700,50), 50, vec(1,1),meteorGroup)
+    # meteor8 = Meteor((700,50), 50, vec(1,1),meteorGroup)
+    # meteor9 = Meteor((700,50), 50, vec(1,1),meteorGroup)
+    # meteor10 = Meteor((700,50), 50, vec(1,1),meteorGroup)
+
+    # planetGroup.add(planet1)
+    planetGroup.add(planet2)
+    planetGroup.add(planet3)
+    planetGroup.add(planet4)
+    planetGroup.add(planet5)
+    # planetGroup.add(target_planet)
+
+    playerGroup = pygame.sprite.Group()
+    playerGroup.add(player)
+
+    asteroidGroup = pygame.sprite.Group()
+    Asteroid(planet4.pos, 20, 90, 10, "-", 1.5, asteroidGroup)
+    Asteroid(planet4.pos, 25, 100, -50, "+", 1, asteroidGroup)
+    Asteroid(planet4.pos, 30, 105, 90, "-", 0.8, asteroidGroup)
+    # asteroid4 = Asteroid(planet4.pos, 35, 110, -120, "+", 0.5, asteroidGroup)
+
+    Asteroid(planet3.pos, 35, 160, 50, "-", 0.7, asteroidGroup)
+    Asteroid(planet3.pos, 20, 100, 10, "-", 1.5, asteroidGroup)
+    Asteroid(planet3.pos, 25, 100, -70, "+", 1, asteroidGroup)
+    Asteroid(planet3.pos, 30, 120, 100, "+", 0.8, asteroidGroup)
+
+    Asteroid(target_planet.pos, 30, 50, 100, "+", 0.8, asteroidGroup)
+    Asteroid(target_planet.pos, 40, 120, -100, "-", 0.5, asteroidGroup)
+
+    Asteroid(planet2.pos, 40, 150, -100, "+", 0.7, asteroidGroup)
+    Asteroid(planet2.pos, 20, 100, -100, "-", 0.5, asteroidGroup)
+
+    while running and not player.gameOver:
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                running = False
+                gameovermenu = True
+                game_over()
+
+        for planet in planetGroup:
+            if pygame.sprite.collide_mask(player, planet):
+                player.explode()
+        # if pygame.sprite.collide_mask(player, planet1):
+        #     player.explode()
+        # if pygame.sprite.collide_mask(player, planet2):
+        #     player.explode()
+        # if pygame.sprite.collide_mask(player, planet3):
+        #     player.explode()
+        # if pygame.sprite.collide_mask(player, planet4):
+        #     player.explode()
+        # if pygame.sprite.collide_mask(player, planet5):
+        #     player.explode()
+        if pygame.sprite.collide_mask(player, target_planet):
+            if player.vel.magnitude() > 1:
+                player.explode()
+            else:
+                thrust_on.stop()
+                lvl_complete_effect.play()
+                lvlfinishmenu = True
+                player.gameOver = True
+                lvl_finished()
+
+        planet_collided_sprites = pygame.sprite.groupcollide(planetGroup,
+                                                             playerGroup,
+                                                             False, False,
+                                                             collided=vicinity_collision)
+
+        if len(planet_collided_sprites) != 0:
+            for planet in planet_collided_sprites:
+                player.gravity(planet, NORMAL_GRAVITY)
+
+        for asteroid in asteroidGroup:
+            if pygame.sprite.collide_mask(player, asteroid):
+                player.explode()
+
+        meteor_collided = pygame.sprite.groupcollide(meteorGroup, planetGroup,
+                                                     False, False)
+        if len(meteor_collided) != 0:
+            for meteor in meteor_collided:
+                meteorGroup.remove(meteor)
+                meteors.remove(meteor)
+                meteor.destroy()
+
+        # meteor_collided_tgt = pygame.sprite.spritecollide(target_planet, meteorGroup, False)
+        # if len(meteor_collided_tgt) != 0:
+        #     for meteor in meteor_collided_tgt:
+        #         meteor.destroy()
+
+        for meteor in meteors:
+            if pygame.sprite.collide_mask(player, meteor):
+                player.explode()
+
+            if pygame.sprite.collide_mask(target_planet, meteor):
+                meteorGroup.remove(meteor)
+                meteors.remove(meteor)
+                meteor.destroy()
+
+        screen.fill((0, 0, 0))
+        starfield1.drawstars()
+        starfield2.drawstars()
+
+        # planet2.update()
+        # planet3.update()
+        # planet4.update()
+        # planet5.update()
+        target_planet.update()
+        # playerGroup.draw(screen)
+        # planetGroup.draw(screen)
+        planetGroup.update()
+        planetGroup.draw(screen)
+        # playerGroup.update()
+        # asteroid1.update()
+        # asteroid2.update()
+        # asteroid3.update()
+        asteroidGroup.update()
+        asteroidGroup.draw(screen)
+        # for meteor in meteors:
+        #     meteor.draw()
+        # meteor1.update()
+        player.update()
+
+        if showintro:
+            pygame.display.update()
+            border = pygame.Rect((50, height - 100), (width - 100, 70))
+            textbox = pygame.Rect((50, height - 100), (width - 100, 70))
+            pygame.draw.rect(screen, black, textbox, border_radius=12)
+            pygame.draw.rect(screen, green, border, 2, border_radius=12)
+            pygame.display.update()
+            if setting_sound_effects:
+                intro_printing.play(-1)
+            displayanimtext('Heyy Captain Cooper it seems you are ready for the next mission. Your next mission is to land on the Krypton planet. Due to the asteroids and meteors, our previous', (
+                60, 42.5))  # text string and x, y coordinate tuple.
+            displayanimtext('team crashed before reaching there. If you find the planet habitable drop the rover, and base station and send SOS signal. Keep the hope alive.', (60, 43.5))
+            displayanimtext('Press ENTER to continue', (800, 44.5))
+            intro_printing.stop()
+
+            while showintro:
+                for event in pygame.event.get():
+                    if event.type == KEYDOWN:
+                        if event.key == K_RETURN:
+                            showintro = False
+                            start_time = pygame.time.get_ticks()
+                            if setting_music:
+                                bg_music.play(-1)
+
+        if start_time:
+            time_since_enter = pygame.time.get_ticks() - start_time
+            if time_since_enter % 20000 > 15000:
+                meteorWarning = True
+
+            if time_since_enter / 20000 > timercount:
+                timercount += 1
+                meteorWarning = False
+                meteorWave = True
+                global warning_effect
+                warning_effect.play()
+                meteors, meteorGroup = createmeteorWave(15,
+                                                        player.rect.centerx)
+                # for meteor in meteors:
+                #     meteorGroup.add(meteor)
+
+            # message = 'Milliseconds since enter: ' + str(time_since_enter)
+            # displaytext(message, 20, 100, 100, white)
+            # count = 'Count: ' + str(timercount)
+            # displaytext(count, 20, 100, 100, white)
+
+
+        if player.fuel <= 0:
+            player.gameOver = True
+            gameovermenu = True
+            game_over()
+
+        showfuelbar(player, [100, height - 20, player.fuel * (900/player.maxfuel), 10])
+
+        # for m in meteors:
+        #     m.update()
+        if meteorWarning:
+            showMeteorWarning()
+        if meteorWave:
+            # displaytext("Meteor Shower", 30, screen.get_rect().centerx,
+            #             screen.get_rect().centery, white)
+            for m in meteors:
+                m.update()
+            if len(meteorGroup) == 0:
+                meteorWave = False
+        pygame.display.flip()
+        clock.tick(60)
+
+
 def game_over():
     color1 = blue
     color2 = white

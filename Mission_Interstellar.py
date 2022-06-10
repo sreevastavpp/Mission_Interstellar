@@ -855,6 +855,23 @@ def level_1():
         pygame.display.flip()
         clock.tick(60)
 
+def createmeteorWave(num, posx):
+    meteors = []
+    mtg = pygame.sprite.Group()
+    for i in range(num):
+        randx = random.randrange(-200, screen.get_width()-200)
+        randy = random.randrange(0, 100) - 150
+        rand_rad = random.randrange(5, 30)
+        rand_speedx = random.randrange(10, 30) / 10
+        rand_speedy = random.randrange(10, 30) / 10
+        meteor = Meteor((randx, randy), rand_rad,
+                        vec(rand_speedx, rand_speedy))
+        mtg.add(meteor)
+        meteors.append(meteor)
+
+    return meteors, mtg
+
+
 def game_over():
     color1 = blue
     color2 = white

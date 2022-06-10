@@ -1100,6 +1100,159 @@ def level_2():
         pygame.display.flip()
         clock.tick(60)
 
+def level_3():
+    global running
+    global gameovermenu
+    global lvlfinishmenu
+    global speed_vec
+
+    showintro = True
+    player = Player((50, 50))
+    player.gameOver = False
+    player.angle_speed = 90
+    player.rotate()
+    player.fuel = 25
+    player.maxfuel = 25
+    starfield1 = stars(1, (150, 150, 150), 75, 0.5)
+    starfield2 = stars(1, (75, 75, 75), 200, 1)
+    player.speed_vec = vec(0, 0)
+    speed_vec = vec(0, 0)
+
+    planetGroup = pygame.sprite.Group()
+
+    # planet1 = Planets(100, (400, 450))
+    planet2 = Planets(200, (100, 600))
+    planet3 = Planets(250, (600, 700))
+    planet4 = Planets(100, (300, 100))
+    planet5 = Planets(125, (750, 250))
+    target_planet = Planets(100, (900, 500), True)
+
+    # planetGroup.add(planet1)
+    planetGroup.add(planet2)
+    planetGroup.add(planet3)
+    planetGroup.add(planet4)
+    planetGroup.add(planet5)
+
+    playerGroup = pygame.sprite.Group()
+    playerGroup.add(player)
+
+    blackhole = BlackHole(screen.get_rect().center, 300)
+    blackholeGroup = pygame.sprite.Group()
+    blackholeGroup.add(blackhole)
+
+    while running and not player.gameOver:
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                running = False
+                gameovermenu = True
+                game_over()
+
+        # if pygame.sprite.collide_mask(player, planet1):
+        #     player.explode()
+        for planet in planetGroup:
+            if pygame.sprite.collide_mask(player, planet):
+                player.explode()
+        # if pygame.sprite.collide_mask(player, planet3):
+        #     player.explode()
+        # if pygame.sprite.collide_mask(player, planet4):
+        #     player.explode()
+        # if pygame.sprite.collide_mask(player, planet5):
+        #     player.explode()
+        if pygame.sprite.collide_mask(player, target_planet):
+            if player.vel.magnitude() > 1:
+                player.explode()
+            else:
+                thrust_on.stop()
+                lvl_complete_effect.play()
+                lvlfinishmenu = True
+                player.gameOver = True
+                lvl_finished()
+
+        planet_collided_sprites = pygame.sprite.groupcollide(planetGroup,
+                                                             playerGroup,
+                                                             False, False,
+                                                             collided=vicinity_collision)
+
+        if len(planet_collided_sprites) != 0:
+            for planet in planet_collided_sprites:
+                player.gravity(planet, NORMAL_GRAVITY)
+
+        blackhole_collided_sprites = pygame.sprite.groupcollide(blackholeGroup,
+                                                                playerGroup,
+                                                                False, False,
+                                                                collided=vicinity_collision)
+        if len(blackhole_collided_sprites) != 0:
+            for b in blackhole_collided_sprites:
+                player.gravity(b, BLACK_HOLE_GRAVITY)
+
+
+        # blackhole_collided_sprites2 = pygame.sprite.groupcollide(blackholeGroup,
+        #                                                         playerGroup,
+        #                                                         False, False,
+        #                                                         collided=blackhole_collision)
+        # if len(blackhole_collided_sprites2) != 0:
+        #     for b in blackhole_collided_sprites2:
+
+        if pygame.sprite.collide_mask(player, blackhole):
+            # blackhole_effect.play()
+            player.explode(True)
+            # blackhole_effect.play()
+
+        screen.fill((0, 0, 0))
+        starfield1.drawstars()
+        starfield2.drawstars()
+
+        planet2.update()
+        planet3.update()
+        planet4.update()
+        planet5.update()
+        target_planet.update()
+        # playerGroup.draw(screen)
+        # planetGroup.draw(screen)
+        # planetGroup.update()
+        # playerGroup.update()
+        blackhole.update()
+        player.update()
+
+        if showintro:
+            pygame.display.update()
+            border = pygame.Rect((50, height - 100), (width - 100, 80))
+            textbox = pygame.Rect((50, height - 100), (width - 100, 80))
+            pygame.draw.rect(screen, black, textbox, border_radius=12)
+            pygame.draw.rect(screen, green, border, 2, border_radius=12)
+            pygame.display.update()
+            if setting_sound_effects:
+                intro_printing.play(-1)
+            displayanimtext(
+                'Good to see you, Captain Cooper. Since you are so experienced a critical mission has been assigned to you that no one has endeavoured. There is a Cybertron planet on',
+                (
+                    60, 42.5))  # text string and x, y coordinate tuple.
+            displayanimtext(
+                'the far end of our galaxy. It is believed that intelligent species exist on Cybertron. Try to communicate with them to help humans. You will also encounter a massive',
+                (60, 43.5))
+            displayanimtext('Blackhole in the path, the biggest in the milky way. Avoid going near it.', (60, 44.5))
+            displayanimtext('Press ENTER to continue', (800, 45.5))
+            intro_printing.stop()
+
+            while showintro:
+                for event in pygame.event.get():
+                    if event.type == KEYDOWN:
+                        if event.key == K_RETURN:
+                            showintro = False
+                            if setting_music:
+                                bg_music.play(-1)
+
+        showfuelbar(player, [100, height - 20, player.fuel*(900/player.maxfuel), 10])
+
+        if player.fuel <= 0:
+            player.gameOver = True
+            gameovermenu = True
+            game_over()
+
+        pygame.display.flip()
+        clock.tick(60)
+
 
 def game_over():
     color1 = blue

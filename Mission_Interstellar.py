@@ -756,8 +756,8 @@ def level_1():
     player.gameOver = False
     player.angle_speed = 90
     player.rotate()
-    player.fuel = 50
-    player.maxfuel = 50
+    player.fuel = 30
+    player.maxfuel = 30
     starfield1 = stars(1, (150, 150, 150), 75, 0.5)
     starfield2 = stars(1, (75, 75, 75), 200, 1)
     player.speed_vec = vec(0, 0)
@@ -882,8 +882,8 @@ def level_2():
     player.gameOver = False
     player.angle_speed = 90
     player.rotate()
-    player.fuel = 50
-    player.maxfuel = 50
+    player.fuel = 20
+    player.maxfuel = 20
     starfield1 = stars(1, (150, 150, 150), 75, 0.5)
     starfield2 = stars(1, (75, 75, 75), 200, 1)
     player.speed_vec = vec(0, 0)
@@ -1111,8 +1111,8 @@ def level_3():
     player.gameOver = False
     player.angle_speed = 90
     player.rotate()
-    player.fuel = 25
-    player.maxfuel = 25
+    player.fuel = 20
+    player.maxfuel = 20
     starfield1 = stars(1, (150, 150, 150), 75, 0.5)
     starfield2 = stars(1, (75, 75, 75), 200, 1)
     player.speed_vec = vec(0, 0)
@@ -1265,8 +1265,8 @@ def level_4():
     player.gameOver = False
     player.angle_speed = 90
     player.rotate()
-    player.fuel = 25
-    player.maxfuel = 25
+    player.fuel = 20
+    player.maxfuel = 20
     starfield1 = stars(1, (150, 150, 150), 75, 0.5)
     starfield2 = stars(1, (75, 75, 75), 200, 1)
     player.speed_vec = vec(0, 0)
@@ -1502,6 +1502,534 @@ def level_4():
         clock.tick(60)
 
 
+def level_5():
+    global running
+    global gameovermenu
+    global lvlfinishmenu
+    global speed_vec
+
+    showintro = True
+    player = Player((50, 300), translate=True)
+    player.gameOver = False
+    player.angle_speed = 90
+    player.rotate()
+    player.fuel = 150
+    player.maxfuel = 150
+    starfield1 = stars(1, (150, 150, 150), 75, 0.5)
+    starfield2 = stars(1, (75, 75, 75), 200, 1)
+    player.speed_vec = vec(0, 0)
+    speed_vec = vec(0, 0)
+    start_time1 = None
+    start_time2 = None
+    start_time3 = None
+    meteor_time = None
+    meteorWarning = False
+    meteorWave = False
+    wormhole_travel1 = False
+    wormhole_travel2 = False
+    wormhole_travel3 = False
+    meteors = []
+    meteorGroup = pygame.sprite.Group()
+    timercount = 1
+
+    wormhole1 = WormHole((3200, 400), 0, 100, translate=True)
+    wormhole2 = WormHole((2000, 350), -100, 100, translate=True)
+    wormhole3 = WormHole((3200, 200), 180, 100, translate=True)
+    wormhole4 = WormHole((4100, 400), -100, 100, translate=True)
+    wormhole5 = WormHole((3200, 600), -180, 100, translate=True)
+    wormhole6 = WormHole((4300, 500), 100, 100, translate=True)
+
+    wormholeGroup = pygame.sprite.Group()
+    wormholeGroup.add(wormhole1)
+    wormholeGroup.add(wormhole2)
+    wormholeGroup.add(wormhole3)
+    wormholeGroup.add(wormhole4)
+    wormholeGroup.add(wormhole5)
+    wormholeGroup.add(wormhole6)
+
+    blackhole1 = BlackHole((2500, 400), 500, translate=True)
+    blackhole2 = BlackHole((3850, 350), 200, translate=True)
+    blackholeGroup = pygame.sprite.Group()
+    blackholeGroup.add(blackhole1)
+    blackholeGroup.add(blackhole2)
+
+    planetGroup = pygame.sprite.Group()
+
+    # planet1 = Planets(100, (450, 450), translate=True)
+    planet2 = Planets(200, (150, 550), translate=True)
+    planet3 = Planets(250, (600, 650), translate=True)
+    planet4 = Planets(100, (300, 100), translate=True)
+    planet5 = Planets(125, (650, 150), translate=True)
+    planet11 = Planets(100, (1000, 200), translate=True)
+
+    planet6 = Planets(100, (1000, 500), translate=True)
+    planet7 = Planets(200, (1500, 200), translate=True)
+    planet8 = Planets(250, (1400, 700), translate=True)
+    planet9 = Planets(100, (1800, 550), translate=True)
+    planet10 = Planets(125, (1900, 100), translate=True)
+
+    planet12 = Planets(100, (4200, 450), translate=True)
+    planet16 = Planets(200, (3550, 550), translate=True)
+    planet13 = Planets(250, (4100, 700), translate=True)
+    planet14 = Planets(100, (3700, 100), translate=True)
+    planet15 = Planets(125, (4050, 200), translate=True)
+    target_planet = Planets(300, (5200, 500), target=True, translate=True)
+
+    planet16 = Planets(200, (200, -300), translate=True)
+    planet17 = Planets(300, (600, -250), translate=True)
+    planet18 = Planets(250, (1100, -200), translate=True)
+    planet19 = Planets(150, (1500, -100), translate=True)
+    planet20 = Planets(200, (1800, -250), translate=True)
+    planet21 = Planets(300, (2200, -250), translate=True)
+    planet22 = Planets(250, (2700, -200), translate=True)
+    planet23 = Planets(150, (3100, -100), translate=True)
+    planet24 = Planets(200, (3400, -250), translate=True)
+    planet25 = Planets(300, (3800, -250), translate=True)
+    planet26 = Planets(250, (4300, -200), translate=True)
+    planet27 = Planets(200, (200, 900), translate=True)
+    planet28 = Planets(300, (600, 1100), translate=True)
+    planet29 = Planets(250, (1100, 1100), translate=True)
+    planet30 = Planets(150, (1500, 1000), translate=True)
+    planet31 = Planets(200, (1800, 1050), translate=True)
+    planet32 = Planets(300, (2200, 1200), translate=True)
+    planet33 = Planets(250, (2700, 1100), translate=True)
+    planet34 = Planets(150, (3100, 1000), translate=True)
+    planet35 = Planets(200, (3400, 1050), translate=True)
+    planet36 = Planets(300, (3800, 1200), translate=True)
+    planet37 = Planets(250, (4300, 1100), translate=True)
+    planet38 = Planets(200, (-200, 200), translate=True)
+    planet39 = Planets(300, (-200, 600), translate=True)
+    planet40 = Planets(250, (-200, 1000), translate=True)
+    planet41 = Planets(200, (-200, -100), translate=True)
+    planetGroup.add(planet16)
+    planetGroup.add(planet17)
+    planetGroup.add(planet18)
+    planetGroup.add(planet19)
+    planetGroup.add(planet20)
+    planetGroup.add(planet21)
+    planetGroup.add(planet22)
+    planetGroup.add(planet23)
+    planetGroup.add(planet24)
+    planetGroup.add(planet25)
+    planetGroup.add(planet26)
+    planetGroup.add(planet27)
+    planetGroup.add(planet28)
+    planetGroup.add(planet29)
+    planetGroup.add(planet30)
+    planetGroup.add(planet31)
+    planetGroup.add(planet32)
+    planetGroup.add(planet33)
+    planetGroup.add(planet34)
+    planetGroup.add(planet35)
+    planetGroup.add(planet36)
+    planetGroup.add(planet37)
+    planetGroup.add(planet38)
+    planetGroup.add(planet39)
+    planetGroup.add(planet40)
+    planetGroup.add(planet41)
+
+
+    # planetGroup.add(planet1)
+    planetGroup.add(planet11)
+    planetGroup.add(planet2)
+    planetGroup.add(planet3)
+    planetGroup.add(planet4)
+    planetGroup.add(planet5)
+    planetGroup.add(planet6)
+    planetGroup.add(planet7)
+    planetGroup.add(planet8)
+    planetGroup.add(planet9)
+    planetGroup.add(planet10)
+    planetGroup.add(planet12)
+    planetGroup.add(planet13)
+    planetGroup.add(planet14)
+    planetGroup.add(planet15)
+    planetGroup.add(planet16)
+
+    playerGroup = pygame.sprite.Group()
+    playerGroup.add(player)
+
+    asteroidGroup = pygame.sprite.Group()
+    Asteroid(planet6.pos, 20, 90, 10, "-", 1.5, asteroidGroup, translate=True)
+    Asteroid(planet6.pos, 25, 100, -50, "+", 1, asteroidGroup, translate=True)
+    Asteroid(planet6.pos, 30, 105, 90, "-", 0.8, asteroidGroup, translate=True)
+
+    Asteroid(planet10.pos, 35, 160, 50, "-", 0.7, asteroidGroup,
+             translate=True)
+    Asteroid(planet10.pos, 20, 100, 10, "-", 1.5, asteroidGroup,
+             translate=True)
+    Asteroid(planet10.pos, 25, 100, -70, "+", 1, asteroidGroup, translate=True)
+    Asteroid(planet10.pos, 30, 120, 100, "+", 0.8, asteroidGroup,
+             translate=True)
+
+    Asteroid(planet8.pos, 30, 50, 180, "+", 0.8, asteroidGroup, translate=True)
+    Asteroid(planet8.pos, 40, 120, -130, "-", 0.5, asteroidGroup,
+             translate=True)
+
+    Asteroid(planet7.pos, 40, 150, -100, "+", 0.7, asteroidGroup,
+             translate=True)
+    Asteroid(planet7.pos, 20, 100, -100, "-", 0.5, asteroidGroup,
+             translate=True)
+
+    Asteroid(blackhole2.pos, 30, 100, -80, "-", 1, asteroidGroup,
+             translate=True)
+    Asteroid(blackhole2.pos, 35, 110, 120, "+", 0.9, asteroidGroup,
+             translate=True)
+
+    shipGroup = pygame.sprite.Group()
+
+    files = [f for f in listdir("Sprites/Spaceship") if
+             isfile(join("Sprites/Spaceship", f))]
+
+    image, rect = load_image(join("Spaceship", files[0]), 50,
+                                         50, -1)
+    ship = Ship(image, rect, (4400, 600), 100, 200, translate=True)
+    shipGroup.add(ship)
+
+    # image, rect = load_image(join("Spaceship", files[1]), 100,
+    #                                      50, -1)
+    # ship = Ship(image, rect, (4800, 200), -170, 200, translate=True)
+    # shipGroup.add(ship)
+
+    image, rect = load_image(join("Spaceship", files[2]), 70,
+                                         35, -1)
+    ship = Ship(image, rect, (4600, 500), -40, 200, translate=True)
+    shipGroup.add(ship)
+
+    # image, rect = load_image(join("Spaceship", files[3]), 100,
+    #                                      50, -1)
+    # ship = Ship(image, rect, (5000, 200), 0, 200, translate=True)
+    # shipGroup.add(ship)
+
+    image, rect = load_image(join("Spaceship", files[4]), 150,
+                                         50, -1)
+    ship = Ship(image, rect, (4900, 300), 0, 200, translate=True)
+    shipGroup.add(ship)
+
+    image, rect = load_image(join("Spaceship", files[5]), 150,
+                                         150, -1)
+    ship = Ship(image, rect, (4500, 200), 0, 200, translate=True)
+    shipGroup.add(ship)
+
+    image, rect = load_image(join("Spaceship", files[6]), 150,
+                                         170, -1)
+    ship = Ship(image, rect, (5200, 250), 0, 200, translate=True)
+    shipGroup.add(ship)
+
+    image, rect = load_image(join("Spaceship", files[7]), 50,
+                                         37, -1)
+    ship = Ship(image, rect, target_planet.pos, 0, 170, -100, "-", 0.1, translate=True,rotate=True)
+    shipGroup.add(ship)
+
+    image, rect = load_image(join("Spaceship", files[8]), 100,
+                                         100, -1)
+    ship = Ship(image, rect, (4700, 400), -20, 200, translate=True)
+    shipGroup.add(ship)
+
+    image, rect = load_image(join("Spaceship", files[9]), 50,
+                                         50, -1)
+    ship = Ship(image, rect, (4900, 600), 0, 200, translate=True)
+    shipGroup.add(ship)
+
+    while running and not player.gameOver:
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                final_lvl_music.stop()
+                running = False
+                gameovermenu = True
+                game_over()
+
+
+        if pygame.sprite.collide_mask(player, wormhole2):
+            print("wormhole_travel1")
+            print(wormhole_travel1)
+            if not wormhole_travel1:
+                thrust_on.stop()
+                wormhole_effect.play()
+                offset(wormhole1.rect.centerx - wormhole2.rect.centerx, planetGroup, wormholeGroup, meteorGroup,
+                       blackholeGroup, asteroidGroup, target_planet, shipGroup, player)
+                player.position.y = wormhole1.rect.centery
+                wormhole_travel1 = True
+                start_time1 = pygame.time.get_ticks()
+                player.throughWormhole = True
+                player.angle_speed = wormhole2.angle
+                player.rotate()
+                player.vel.rotate_ip(wormhole2.angle)
+                player.vel += player.acceleration
+
+        if pygame.sprite.collide_mask(player, wormhole1):
+            if not wormhole_travel1:
+                thrust_on.stop()
+                wormhole_effect.play()
+                offset(wormhole2.rect.centerx - wormhole1.rect.centerx, planetGroup, wormholeGroup, meteorGroup,
+                       blackholeGroup, asteroidGroup, target_planet, shipGroup, player)
+                player.position.y = wormhole2.rect.centery
+                wormhole_travel1 = True
+                start_time1 = pygame.time.get_ticks()
+                player.throughWormhole = True
+                player.angle_speed = -wormhole2.angle
+                player.rotate()
+                player.vel.rotate_ip(-wormhole2.angle)
+                player.vel += player.acceleration
+
+        if pygame.sprite.collide_mask(player, wormhole3):
+            if not wormhole_travel2:
+                thrust_on.stop()
+                wormhole_effect.play()
+                offset(wormhole4.rect.left - wormhole3.rect.centerx, planetGroup, wormholeGroup,
+                       meteorGroup,
+                       blackholeGroup, asteroidGroup, target_planet, shipGroup, player)
+                player.position.y = wormhole4.rect.centery
+                wormhole_travel2 = True
+                start_time2 = pygame.time.get_ticks()
+                player.throughWormhole = True
+                player.angle_speed = wormhole4.angle
+                player.rotate()
+                player.vel.rotate_ip(wormhole4.angle)
+                player.vel += player.acceleration
+
+        if pygame.sprite.collide_mask(player, wormhole4):
+            if not wormhole_travel2:
+                thrust_on.stop()
+                wormhole_effect.play()
+                offset(wormhole3.rect.centerx - wormhole4.rect.centerx, planetGroup, wormholeGroup,
+                       meteorGroup,
+                       blackholeGroup, asteroidGroup, target_planet, shipGroup, player)
+                player.position.y = wormhole3.rect.centery
+                wormhole_travel2 = True
+                start_time2 = pygame.time.get_ticks()
+                player.throughWormhole = True
+                player.angle_speed = -wormhole4.angle
+                player.rotate()
+                player.vel.rotate_ip(-wormhole4.angle)
+                player.vel += player.acceleration
+
+        if pygame.sprite.collide_mask(player, wormhole5):
+            if not wormhole_travel3:
+                thrust_on.stop()
+                wormhole_effect.play()
+                offset(wormhole6.rect.centerx - wormhole5.rect.centerx + 50, planetGroup, wormholeGroup,
+                       meteorGroup,
+                       blackholeGroup, asteroidGroup, target_planet, shipGroup, player)
+                player.position.y = wormhole6.rect.centery
+                wormhole_travel3 = True
+                start_time3 = pygame.time.get_ticks()
+                player.throughWormhole = True
+                player.angle_speed = -wormhole6.angle
+                player.rotate()
+                player.vel.rotate_ip(-wormhole6.angle)
+                player.vel += player.acceleration
+
+        if pygame.sprite.collide_mask(player, wormhole6):
+            if not wormhole_travel3:
+                thrust_on.stop()
+                wormhole_effect.play()
+                offset(wormhole5.rect.centerx - wormhole6.rect.centerx, planetGroup, wormholeGroup,
+                       meteorGroup,
+                       blackholeGroup, asteroidGroup, target_planet, shipGroup, player)
+                player.position.y = wormhole5.rect.centery
+                wormhole_travel3 = True
+                start_time3 = pygame.time.get_ticks()
+                player.throughWormhole = True
+                player.angle_speed = wormhole6.angle
+                player.rotate()
+                player.vel.rotate_ip(wormhole6.angle)
+                player.vel += player.acceleration
+
+
+
+        for planet in planetGroup:
+            if pygame.sprite.collide_mask(player, planet):
+                player.explode()
+
+        for ship in shipGroup:
+            if pygame.sprite.collide_mask(player, ship):
+                player.explode()
+
+        if pygame.sprite.collide_mask(player, target_planet):
+            if player.vel.magnitude() > 1:
+                player.explode()
+            else:
+                final_lvl_music.stop()
+                thrust_on.stop()
+                game_complete_effect.play()
+                lvlfinishmenu = True
+                player.gameOver = True
+                lvl_finished()
+
+        planet_collided_sprites = pygame.sprite.groupcollide(planetGroup,
+                                                             playerGroup,
+                                                             False, False,
+                                                             collided=vicinity_collision)
+
+        if len(planet_collided_sprites) != 0:
+            for planet in planet_collided_sprites:
+                player.gravity(planet, NORMAL_GRAVITY)
+
+        blackhole_collided_sprites = pygame.sprite.groupcollide(blackholeGroup,
+                                                                playerGroup,
+                                                                False, False,
+                                                                collided=vicinity_collision)
+        if len(blackhole_collided_sprites) != 0:
+            for b in blackhole_collided_sprites:
+                player.gravity(b, BLACK_HOLE_GRAVITY)
+
+        for blackhole in blackholeGroup:
+            if pygame.sprite.collide_mask(player, blackhole):
+                player.explode(True)
+
+        meteor_collided = pygame.sprite.groupcollide(meteorGroup, planetGroup,
+                                                     False, False)
+
+        if len(meteor_collided) != 0:
+            for meteor in meteor_collided:
+                meteors.remove(meteor)
+                meteorGroup.remove(meteor)
+                meteor.destroy()
+
+        meteor_collided = pygame.sprite.groupcollide(meteorGroup, shipGroup,
+                                                     False, False)
+        if len(meteor_collided) != 0:
+            for meteor in meteor_collided:
+                meteors.remove(meteor)
+                meteorGroup.remove(meteor)
+                meteor.destroy()
+
+        meteor_collided = pygame.sprite.groupcollide(meteorGroup, blackholeGroup,
+                                                     False, False)
+        if len(meteor_collided) != 0:
+            for meteor in meteor_collided:
+                meteors.remove(meteor)
+                meteorGroup.remove(meteor)
+                meteor.destroy()
+
+        for meteor in meteors:
+            if pygame.sprite.collide_mask(player, meteor):
+                player.explode()
+
+            if pygame.sprite.collide_mask(target_planet, meteor):
+                meteors.remove(meteor)
+                meteorGroup.remove(meteor)
+                meteor.destroy()
+
+
+        for asteroid in asteroidGroup:
+            if pygame.sprite.collide_mask(player, asteroid):
+                player.explode()
+
+
+
+        screen.fill((0, 0, 0))
+        starfield1.drawstars()
+        starfield2.drawstars()
+
+        target_planet.update()
+        planetGroup.update()
+        planetGroup.draw(screen)
+        asteroidGroup.update()
+        asteroidGroup.draw(screen)
+        wormholeGroup.update()
+        wormholeGroup.draw(screen)
+        meteorGroup.update()
+        meteorGroup.draw(screen)
+        blackholeGroup.update()
+        blackholeGroup.draw(screen)
+        shipGroup.update()
+        shipGroup.draw(screen)
+        player.update()
+
+        if showintro:
+            pygame.display.update()
+            # offset(500, planetGroup, wormholeGroup, meteorGroup, blackholeGroup, asteroidGroup, target_planet, player)
+            pygame.display.update()
+            border = pygame.Rect((50, height - 185), (width - 100, 165))
+            textbox = pygame.Rect((50, height - 185), (width - 100, 165))
+            pygame.draw.rect(screen, black, textbox, border_radius=12)
+            pygame.draw.rect(screen, green, border, 2, border_radius=12)
+            pygame.display.update()
+            if setting_sound_effects:
+                intro_printing.play(-1)
+            displayanimtext('TARS:', (60, 37))
+            displayanimtext('Captain Cooper a massive asteroid of the size of the moon is expected to hit the earth within', (
+                115, 37))
+            displayanimtext('24 hours with a speed of 8 lakh Kmph that will wipe out life on earth. You are the most', (
+                115, 38))
+            displayanimtext('experienced intergalactic captain on the earth. So you are given the most important and', (115, 39))
+            displayanimtext('dangerous task to take humans in the Endurance to Proxima Centauri B. It is almost 5', (115, 40))
+            displayanimtext('light-years away, but our Ion thrusters have been upgraded. Due to the maximum ', (115, 41))
+            displayanimtext('probability of life on Proxima Centauri B, we have previously sent many fleets of', (115, 42))
+            displayanimtext('spaceships. The remaining spaceships will follow you. You can make history by escorting', (115, 43))
+            displayanimtext('the whole human civilization to another planet that is never done before.', (115, 44))
+            displayanimtext('Press ENTER to continue', (700, 45.5))
+            intro_printing.stop()
+
+            while showintro:
+                for event in pygame.event.get():
+                    if event.type == KEYDOWN:
+                        if event.key == K_RETURN:
+                            showintro = False
+                            meteor_time = pygame.time.get_ticks()
+                            if setting_music:
+                                final_lvl_music.play(-1)
+
+        if meteor_time:
+            time_since_enter = pygame.time.get_ticks() - meteor_time
+            if time_since_enter % 20000 > 15000:
+                meteorWarning = True
+
+            if time_since_enter / 20000 > timercount:
+                timercount += 1
+                thrust_on.stop()
+                if setting_sound_effects:
+                    global warning_effect
+                    warning_effect.play()
+                meteorWarning = False
+                meteorWave = True
+                meteors, meteorGroup = createmeteorWave(30,
+                                                        player.rect.centerx)
+
+        if meteorWarning:
+            showMeteorWarning()
+        if meteorWave:
+            # displaytext("Meteor Shower", 30, screen.get_rect().centerx,
+            #             screen.get_rect().centery, white)
+            for m in meteors:
+                m.update()
+            if len(meteorGroup) == 0:
+                meteorWave = False
+
+        showfuelbar(player, [100, height - 20, player.fuel*(900/player.maxfuel), 10])
+
+        if player.fuel <= 0:
+            final_lvl_music.stop()
+            player.gameOver = True
+            gameovermenu = True
+            game_over()
+
+        if wormhole_travel1:
+            if pygame.time.get_ticks() - start_time1 > 2000:
+                wormhole_travel1 = False
+                player.angle_speed = 0
+            if player.vel.length() < 0.5:
+                player.vel += player.acceleration
+
+        if wormhole_travel2:
+            if pygame.time.get_ticks() - start_time2 > 1000:
+                wormhole_travel2 = False
+                player.angle_speed = 0
+            if player.vel.length() < 0.5:
+                player.vel += player.acceleration
+
+        if wormhole_travel3:
+            if pygame.time.get_ticks() - start_time3 > 1000:
+                wormhole_travel3 = False
+                player.angle_speed = 0
+            if player.vel.length() < 0.5:
+                player.vel += player.acceleration
+
+        pygame.display.flip()
+        clock.tick(60)
 
 def game_over():
     color1 = blue

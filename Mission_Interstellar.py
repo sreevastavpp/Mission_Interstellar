@@ -1254,6 +1254,255 @@ def level_3():
         clock.tick(60)
 
 
+def level_4():
+    global running
+    global gameovermenu
+    global lvlfinishmenu
+    global speed_vec
+
+    showintro = True
+    player = Player((50, 50))
+    player.gameOver = False
+    player.angle_speed = 90
+    player.rotate()
+    player.fuel = 25
+    player.maxfuel = 25
+    starfield1 = stars(1, (150, 150, 150), 75, 0.5)
+    starfield2 = stars(1, (75, 75, 75), 200, 1)
+    player.speed_vec = vec(0, 0)
+    speed_vec = vec(0, 0)
+
+    planetGroup = pygame.sprite.Group()
+
+    planet1 = Planets(100, (550, 400))
+    planet2 = Planets(200, (150, 550))
+    planet3 = Planets(250, (600, 700))
+    planet4 = Planets(100, (300, 100))
+    planet5 = Planets(125, (650, 150))
+    target_planet = Planets(150, (900, 500), True)
+    start_time = None
+    meteor_time = None
+    meteorWarning = False
+    meteorWave = False
+    wormhole_travel = False
+    meteors = []
+    meteorGroup = pygame.sprite.Group()
+    timercount = 1
+
+    planetGroup.add(planet1)
+    planetGroup.add(planet2)
+    planetGroup.add(planet3)
+    planetGroup.add(planet4)
+    planetGroup.add(planet5)
+
+    asteroidGroup = pygame.sprite.Group()
+    Asteroid(planet1.pos, 20, 70, 10, "-", 1.5, asteroidGroup)
+    Asteroid(planet1.pos, 25, 60, -70, "+", 1.2, asteroidGroup)
+    Asteroid(planet1.pos, 30, 70, 100, "+", 1, asteroidGroup)
+
+    Asteroid(planet5.pos, 20, 80, 10, "-", 1.5, asteroidGroup)
+    Asteroid(planet5.pos, 25, 100, -70, "+", 1.2, asteroidGroup)
+    Asteroid(planet5.pos, 30, 120, 100, "+", 1, asteroidGroup)
+
+    playerGroup = pygame.sprite.Group()
+    playerGroup.add(player)
+
+    wormhole1 = WormHole((150, 350), 0, 100)
+    wormhole2 = WormHole((900, 250), -100, 100)
+    wormholeGroup = pygame.sprite.Group()
+    wormholeGroup.add(wormhole1)
+    wormholeGroup.add(wormhole2)
+
+    while running and not player.gameOver:
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                running = False
+                gameovermenu = True
+                game_over()
+
+        # if pygame.sprite.collide_mask(player, planet1):
+        #     player.explode()
+        for planet in planetGroup:
+            if pygame.sprite.collide_mask(player, planet):
+                player.explode()
+        # if pygame.sprite.collide_mask(player, planet3):
+        #     player.explode()
+        # if pygame.sprite.collide_mask(player, planet4):
+        #     player.explode()
+        # if pygame.sprite.collide_mask(player, planet5):
+        #     player.explode()
+        if pygame.sprite.collide_mask(player, target_planet):
+            if player.vel.magnitude() > 1:
+                player.explode()
+            else:
+                thrust_on.stop()
+                lvl_complete_effect.play()
+                lvlfinishmenu = True
+                player.gameOver = True
+                lvl_finished()
+
+        planet_collided_sprites = pygame.sprite.groupcollide(planetGroup,
+                                                             playerGroup,
+                                                             False, False,
+                                                             collided=vicinity_collision)
+
+        if len(planet_collided_sprites) != 0:
+            for planet in planet_collided_sprites:
+                player.gravity(planet, NORMAL_GRAVITY)
+
+        meteor_collided = pygame.sprite.groupcollide(meteorGroup, planetGroup,
+                                                     False, False)
+        if len(meteor_collided) != 0:
+            for meteor in meteor_collided:
+                meteors.remove(meteor)
+                meteorGroup.remove(meteor)
+                meteor.destroy()
+
+        for meteor in meteors:
+            if pygame.sprite.collide_mask(player, meteor):
+                player.explode()
+
+            if pygame.sprite.collide_mask(target_planet, meteor):
+                meteors.remove(meteor)
+                meteorGroup.remove(meteor)
+                meteor.destroy()
+
+            if pygame.sprite.collide_mask(meteor, wormhole1):
+                meteor.pos = wormhole2.rect.center
+                meteor.speed.rotate_ip(-wormhole2.angle)
+
+            if pygame.sprite.collide_mask(meteor, wormhole2):
+                meteor.pos = wormhole1.rect.center
+                meteor.speed.rotate_ip(-wormhole2.angle)
+        # wormhole_collided_sprites = pygame.sprite.groupcollide(wormholeGroup,
+        #                                                      playerGroup,
+        #                                                      False, False,
+        #                                                      collided=vicinity_collision)
+        # if len(wormhole_collided_sprites) != 0:
+        #     for w in wormhole_collided_sprites:
+        #         player.gravity(w, BLACK_HOLE_GRAVITY)
+
+        if pygame.sprite.collide_mask(player, wormhole1):
+            if not wormhole_travel:
+                thrust_on.stop()
+                wormhole_effect.play()
+                player.position = vec(wormhole2.rect.centerx,
+                                      wormhole2.rect.centery)
+                wormhole_travel = True
+                start_time = pygame.time.get_ticks()
+                player.throughWormhole = True
+                player.angle_speed = -wormhole2.angle
+                player.rotate()
+                player.vel.rotate_ip(-wormhole2.angle)
+                player.vel += player.acceleration
+
+        if pygame.sprite.collide_mask(player, wormhole2):
+            if not wormhole_travel:
+                thrust_on.stop()
+                wormhole_effect.play()
+                wormhole_effect.play()
+                player.position = vec(wormhole1.rect.centerx,
+                                      wormhole1.rect.centery)
+                wormhole_travel = True
+                start_time = pygame.time.get_ticks()
+                player.throughWormhole = True
+                player.angle_speed = -wormhole2.angle
+                player.rotate()
+                player.vel.rotate_ip(-wormhole2.angle)
+                player.vel += player.acceleration
+
+        for asteroid in asteroidGroup:
+            if pygame.sprite.collide_mask(player, asteroid):
+                player.explode()
+
+        screen.fill((0, 0, 0))
+        starfield1.drawstars()
+        starfield2.drawstars()
+
+        # planet2.update()
+        # planet3.update()
+        # planet4.update()
+        # planet5.update()
+        target_planet.update()
+        planetGroup.update()
+        planetGroup.draw(screen)
+        asteroidGroup.update()
+        asteroidGroup.draw(screen)
+        wormholeGroup.update()
+        wormholeGroup.draw(screen)
+        meteorGroup.update()
+        meteorGroup.draw(screen)
+        player.update()
+
+        if showintro:
+            pygame.display.update()
+            border = pygame.Rect((50, height - 100), (width - 100, 80))
+            textbox = pygame.Rect((50, height - 100), (width - 100, 80))
+            pygame.draw.rect(screen, black, textbox, border_radius=12)
+            pygame.draw.rect(screen, green, border, 2, border_radius=12)
+            pygame.display.update()
+            if setting_sound_effects:
+                intro_printing.play(-1)
+            displayanimtext('Captain Cooper, there is bad news. The fuel tank was damaged by the black hole and a large amount of fuel leaked. We need to head towards Solaris about 2 lightyears', (
+                60, 42.5))  # text string and x, y coordinate tuple.
+            displayanimtext('away. We cannot reach Solaris with low fuel, so I found a wormhole in the path that can shorten our journey. Our previous team almost reached Solaris but was pulled due', (60, 43.5))
+            displayanimtext('to the strong magnetic fields at the other end of the wormhole, so be careful. Hoping to reach without collision.', (60, 44.5))
+            displayanimtext('Press ENTER to continue', (800, 45.5))
+            intro_printing.stop()
+
+            while showintro:
+                for event in pygame.event.get():
+                    if event.type == KEYDOWN:
+                        if event.key == K_RETURN:
+                            showintro = False
+                            meteor_time = pygame.time.get_ticks()
+                            # if setting_music:
+                                # bg_music.play(-1)
+
+        if meteor_time:
+            time_since_enter = pygame.time.get_ticks() - meteor_time
+            if time_since_enter % 20000 > 15000:
+                meteorWarning = True
+
+            if time_since_enter / 20000 > timercount:
+                timercount += 1
+                meteorWarning = False
+                meteorWave = True
+                global warning_effect
+                warning_effect.play()
+                meteors, meteorGroup = createmeteorWave(15,
+                                                        player.rect.centerx)
+
+        if meteorWarning:
+            showMeteorWarning()
+        if meteorWave:
+            # displaytext("Meteor Shower", 30, screen.get_rect().centerx,
+            #             screen.get_rect().centery, white)
+            for m in meteors:
+                m.update()
+            if len(meteorGroup) == 0:
+                meteorWave = False
+
+        showfuelbar(player, [100, height - 20, player.fuel*(900/player.maxfuel), 10])
+
+        if player.fuel <= 0:
+            player.gameOver = True
+            gameovermenu = True
+            game_over()
+
+        if wormhole_travel:
+            if pygame.time.get_ticks() - start_time > 3000:
+                wormhole_travel = False
+                player.angle_speed = 0
+            if player.vel.length() < 0.5:
+                player.vel += player.acceleration
+
+        pygame.display.flip()
+        clock.tick(60)
+
+
+
 def game_over():
     color1 = blue
     color2 = white

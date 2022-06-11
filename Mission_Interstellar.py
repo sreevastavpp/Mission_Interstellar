@@ -1501,6 +1501,33 @@ def level_4():
         pygame.display.flip()
         clock.tick(60)
 
+def offset(offset, planetGroup, wormholeGroup, meteorGroup, blackholeGroup, asteroidGroup, target_pt, shipGroup, player, withplayer= False):
+    for planet in planetGroup:
+        planet.pos.x -= offset
+
+    for wormhole in wormholeGroup:
+        wormhole.pos.x -= offset
+
+    for meteor in meteorGroup:
+        meteor.pos.x -= offset
+
+    for blackhole in blackholeGroup:
+        blackhole.pos.x -= offset
+
+    for asteroid in asteroidGroup:
+        asteroid.pos.x -= offset
+
+    for ship in shipGroup:
+        ship.pos.x -= offset
+
+    target_pt.pos.x -= offset
+
+    if withplayer:
+        player.position.x -= offset
+        player.rect.centerx -= offset
+
+    pygame.display.update()
+
 
 def level_5():
     global running

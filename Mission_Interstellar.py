@@ -2800,8 +2800,6 @@ def game_finished():
                                    screen.get_height(), -1)
             rect.center = screen.get_rect().center
             rect.bottom = screen.get_rect().bottom
-            print(screen.get_width())
-            print(screen.get_height())
             screen.blit(img, rect)
             pygame.display.update()
             if setting_sound_effects:

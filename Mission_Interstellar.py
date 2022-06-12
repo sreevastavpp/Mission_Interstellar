@@ -1,24 +1,206 @@
 import os
+
 import pygame
-import sys
-import time
+from os import listdir
+from os.path import isfile, join
 import math
 import random
 from pygame.locals import *
 
-
 pygame.init()
+pygame.mixer.init()
 
-pygame.display.set_caption('Mission Interstellar')
+pygame.display.set_caption('Mission Intersteller')
 
 size = (width, height) = (1024, 768)
-screen = pygame.display.set_mode(size, DOUBLEBUF | FULLSCREEN)
+black = (0, 0, 0)
+white = (255, 255, 255)
+green = (0, 155, 0)
+red = (155, 0, 0)
+blue = (0, 0, 155)
+yellow = (255, 255, 0)
 clock = pygame.time.Clock()
-vec = pygame.math.Vector2
 
 MAX_SPEED = 5
+NORMAL_GRAVITY = 1.2
+BLACK_HOLE_GRAVITY = 1.2
 
-running = True
+vec = pygame.math.Vector2
+
+screen = pygame.display.set_mode(size, DOUBLEBUF | FULLSCREEN)
+
+# ship_img = pygame.image.load("ship.png")
+
+running = False
+mainmenu = True
+submenu = False
+howtoplaymenu = False
+settingsmenu = False
+gameovermenu = False
+lvlfinishmenu = False
+gamefinishscreen = False
+gameOver = False
+setting_music = True
+setting_sound_effects = True
+currentLvl = 0
+
+
+# bg_music = pygame.mixer.Sound('Sprites/bg_music.ogg')
+# bg_music.set_volume(0)
+menu_select = pygame.mixer.Sound('Sprites/Sound Effects/button.wav')
+menu_select.set_volume(0.3)
+warning_effect = pygame.mixer.Sound('Sprites/Sound Effects/warning.wav')
+warning_effect.set_volume(0.5)
+intro_printing = pygame.mixer.Sound('Sprites/Sound Effects/intro_print.wav')
+wormhole_effect = pygame.mixer.Sound('Sprites/Sound Effects/wormhole_effect.wav')
+meteor_effect = pygame.mixer.Sound('Sprites/Sound Effects/meteor.wav')
+blackhole_effect = pygame.mixer.Sound('Sprites/Sound Effects/blackhole.wav')
+blackhole_effect.set_volume(0.5)
+thrust_on = pygame.mixer.Sound('Sprites/Sound Effects/rocket on.wav')
+thrust_on.set_volume(0.1)
+explosion_effect = pygame.mixer.Sound('Sprites/explosion.wav')
+explosion_effect.set_volume(0.5)
+# thrust_on.set_volume(0.5)
+# thrust_off = pygame.mixer.Sound('Sprites/Sound Effects/rocket off2.wav')
+# thrust = pygame.mixer.Sound('Sprites/Sound Effects/thrust.wav')
+# thrust.set_volume(0.1)
+lvl_complete_effect = pygame.mixer.Sound('Sprites/Sound Effects/lvl_complete.wav')
+game_complete_effect = pygame.mixer.Sound('Sprites/Sound Effects/game_complete.wav')
+game_complete_effect.set_volume(0.5)
+lvl_music = pygame.mixer.Sound('Sprites/Sound Effects/levelmusic1.wav')
+lvl_music.set_volume(0.5)
+final_lvl_music = pygame.mixer.Sound('Sprites/Sound Effects/levelmusic2.wav')
+final_lvl_music.set_volume(0.5)
+speed_vec = vec(0, 0)
+
+desc_font = pygame.font.Font
+
+
+def displaytext(
+        text,
+        fontsize,
+        x,
+        y,
+        color,
+):
+    font = pygame.font.SysFont('sawasdee', fontsize, True)
+    text = font.render(text, 1, color)
+    textpos = text.get_rect(centerx=x, centery=y)
+    screen.blit(text, textpos)
+    return text
+
+def displaymenutext(
+        text,
+        fontsize,
+        x,
+        y,
+        color,
+):
+    menufont = pygame.font.Font("Sprites/ethnocentric.otf", fontsize)
+    text = menufont.render(text, 1, color)
+    textpos = text.get_rect(centerx=x, centery=y)
+    screen.blit(text, textpos)
+    return text
+
+def displaycustomanimtext(string, tuple, font, size, color, bgcolor= None):
+    # basicfont = pygame.font.Font("Sprites/Space.tff", 16)
+    line_space = 16
+    x, y = tuple
+    y = y * line_space  ##shift text down by one line
+    char = ''  ##new string that will take text one char at a time. Not the best variable name I know.
+    letter = 0
+    count = 0
+    for i in range(len(string)):
+        # basicfont = pygame.font.SysFont('sawasdee', size)
+        basicfont = pygame.font.Font(font, size)
+        pygame.event.clear()  ## this is very important if your event queue is not handled properly elsewhere. Alternativly pygame.event.pump() would work.
+        pygame.time.wait(25)  ##25
+        char = char + string[letter]
+        text = basicfont.render(char, False, color, bgcolor)  # First tuple is text color, second tuple is background color
+        textrect = text.get_rect(
+            topleft=(x,
+                     y))  ## x, y's provided in function call. y coordinate amended by line height where needed
+        screen.blit(text, textrect)
+        pygame.display.update(
+            textrect)  ## update only the text just added without removing previous lines.
+        count += 1
+        letter += 1
+
+
+def displayanimtext(string, tuple):
+    # basicfont = pygame.font.Font("Sprites/Space.tff", 16)
+    line_space = 16
+    x, y = tuple
+    y = y * line_space  ##shift text down by one line
+    char = ''  ##new string that will take text one char at a time. Not the best variable name I know.
+    letter = 0
+    count = 0
+    for i in range(len(string)):
+        # basicfont = pygame.font.SysFont('sawasdee', 16)
+        basicfont = pygame.font.Font("Sprites/s.ttf", 15)
+        pygame.event.clear()  ## this is very important if your event queue is not handled properly elsewhere. Alternativly pygame.event.pump() would work.
+        pygame.time.wait(1)  ##25
+        char = char + string[letter]
+        text = basicfont.render(char, False, (2, 241, 16))  # First tuple is text color, second tuple is background color
+        textrect = text.get_rect(
+            topleft=(x,
+                     y))  ## x, y's provided in function call. y coordinate amended by line height where needed
+        screen.blit(text, textrect)
+        pygame.display.update(
+            textrect)  ## update only the text just added without removing previous lines.
+        count += 1
+        letter += 1
+
+
+
+
+class Button:
+    def __init__(self, text, width, height, pos, elevation, pressed):
+        self.font = pygame.font.Font("Sprites/ethnocentric.otf", 20)
+        self.pressed = pressed
+        self.top_rect = pygame.Rect(pos, (width, height))
+        self.border = pygame.Rect(pos, (width + 2, height + 2))
+        self.top_color = blue
+        self.border_color = blue
+
+        self.text = text
+        self.text_surf = self.font.render(text, True, '#FFFFFF')
+        self.text_rect = self.text_surf.get_rect(center=self.top_rect.center)
+
+    def change_text(self, newtext):
+        self.text_surf = self.font.render(newtext, True, '#FFFFFF')
+        self.text_rect = self.text_surf.get_rect(center=self.top_rect.center)
+
+    def draw(self):
+        if self.pressed:
+            self.change_text("On")
+            self.top_color = blue
+        else:
+            self.change_text("Off")
+            self.top_color = black
+        pygame.draw.rect(screen, self.top_color, self.top_rect,
+                         border_radius=12)
+        pygame.draw.rect(screen, self.border_color, self.border, 2,
+                         border_radius=12)
+        screen.blit(self.text_surf, self.text_rect)
+
+    def check_click(self):
+        mouse_pos = pygame.mouse.get_pos()
+        if self.top_rect.collidepoint(mouse_pos):
+            if pygame.mouse.get_pressed()[0]:
+                if setting_sound_effects:
+                    menu_select.play()
+                if self.pressed:
+                    self.pressed = False
+                    self.change_text("Off")
+                    self.top_color = black
+                else:
+                    self.pressed = True
+                    self.change_text("On")
+                    self.top_color = blue
+
+        return self.pressed
+
 
 def load_image(file, size_x=-1, size_y=-1, colorkey=None):
     path = os.path.join('Sprites', file)
@@ -34,18 +216,24 @@ def load_image(file, size_x=-1, size_y=-1, colorkey=None):
 
     return image, image.get_rect()
 
-def displaytext(
-        text,
-        fontsize,
-        x,
-        y,
-        color,
-):
-    font = pygame.font.SysFont('sawasdee', fontsize, True)
-    text = font.render(text, 1, color)
-    textpos = text.get_rect(centerx=x, centery=y)
-    screen.blit(text, textpos)
-    return text
+
+def showfuelbar(player, pos):
+    unit = 900/player.maxfuel
+    if player.fuel > 0:
+        fuelbar = pygame.Surface((player.fuel * unit, 10), pygame.SRCALPHA, 32)
+        fuelbar.convert_alpha()
+        barcolor = green
+
+        if player.fuel > player.maxfuel * 0.6:
+            barcolor = green
+        elif player.fuel > player.maxfuel * 0.3:
+            barcolor = yellow
+        elif player.fuel < player.maxfuel * 0.3 and player.fuel > 0:
+            warning("Low Fuel!!!")
+            barcolor = red
+
+        rect = pygame.draw.rect(screen, barcolor, pos)
+        displaymenutext('FUEL', 15, 60, height - 15, white)
 
 
 class stars:
@@ -62,7 +250,9 @@ class stars:
 
     def drawstars(self):
         for x in range(self.nofstars):
-            pygame.draw.circle(screen, self.color, (self.starpos[x][0], self.starpos[x][1]), self.radius)
+            pygame.draw.circle(screen, self.color,
+                               (self.starpos[x][0], self.starpos[x][1]),
+                               self.radius)
         self.movestars()
 
     def movestars(self):
@@ -78,50 +268,36 @@ class stars:
                 self.starpos[x][1] = height
 
 
-class Explosion(pygame.sprite.Sprite):
+def blackhole_collision(left, right):
+    if left != right:
+        return left.rect2.colliderect(right.rect)
+    else:
+        return False
 
-    def __init__(self, x, y, radius=-1):
+
+def vicinity_collision(left, right):
+    if left != right:
+        return left.vicinity_rect.colliderect(right.rect)
+    else:
+        return False
+
+
+class Fuelpack(pygame.sprite.Sprite):
+
+    def __init__(self, pos):
         pygame.sprite.Sprite.__init__(self)
-        sheet = pygame.image.load('Sprites/enemy_explode.png')
-        self.images = []
-        for i in range(0, 768, 48):
-            rect = pygame.Rect((i, 0, 48, 48))
-            image = pygame.Surface(rect.size)
-            image = image.convert()
-            colorkey = image.get_at((10, 10))
-            image.set_colorkey(colorkey, RLEACCEL)
 
-            image.blit(sheet, (0, 0), rect)
-            if radius != -1:
-                image = pygame.transform.scale(image, (radius, radius))
+        (self.image, self.rect) = load_image('fuel3.png', 60, 60, -1)
+        # self.rect = self.rect.inflate(1.1,1.1)
+        self.pos = pos
+        self.rect.center = self.pos
 
-            self.images.append(image)
-
-
-        print("len(self.images)")
-        print(len(self.images))
-
-        self.image = self.images[0]
-        self.index = 0
-        print("self.index")
-        print(self.index)
-        self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
+    def drawfuelpack(self):
+        self.pos -= speed_vec * 0.1
+        self.rect.center = self.pos
+        # pygame.draw.circle(screen, white, self.rect.center, 21)
         screen.blit(self.image, self.rect)
-        pygame.display.update()
 
-    def update(self):
-        self.image = self.images[self.index]
-        screen.blit(self.image, self.rect)
-        pygame.display.update()
-        print("self.index")
-        print(self.index)
-        print("len(self.images)")
-        print(len(self.images))
-        if self.index + 1 >= len(self.images):
-            self.index = 0
-        else:
-            self.index += 1
 
 class Planets(pygame.sprite.Sprite):
 
@@ -169,23 +345,20 @@ class Planets(pygame.sprite.Sprite):
         # pygame.draw.circle(self.image, self.color, (self.planepos[0], self.planepos[1]), self.radius)
         screen.blit(self.image, self.rect)
 
+
 class BlackHole(pygame.sprite.Sprite):
 
     def __init__(self, pos, radius, translate=False):
         pygame.sprite.Sprite.__init__(self)
 
         (self.image, self.rect) = load_image('blackhole.png', radius,
-                                             radius * 0.45, -1)
+                                             radius*0.45, -1)
 
         self.rect.center = pos
         self.pos = vec(pos)
         self.radius = radius
         self.vicinity_rect = self.rect.inflate(radius * 1.5, radius * 1.5)
         self.vicinity_rect.center = self.rect.center
-        self.rect2 = self.rect
-        self.rect2.width += 20
-        self.rect2.height += 20
-        self.rect2.center = self.rect.center
         self.translate = translate
 
     def update(self):
@@ -193,7 +366,35 @@ class BlackHole(pygame.sprite.Sprite):
             self.pos -= speed_vec
             self.rect.center = self.pos
             self.vicinity_rect.center = self.rect.center
-            self.rect2.center = self.rect.center
+
+        screen.blit(self.image, self.rect)
+
+    # def drawblackhole(self):
+    #     # pygame.draw.circle(self.image, self.color, (self.planepos[0], self.planepos[1]), self.radius)
+    #     screen.blit(self.image, self.rect)
+    #     # self.moveplanets()
+
+
+class WormHole(pygame.sprite.Sprite):
+
+    def __init__(self, pos, angle, radius, translate=False):
+        pygame.sprite.Sprite.__init__(self)
+
+        (self.original_image, self.rect) = load_image('wormhole.png', radius,
+                                                      radius * 0.45, white)
+
+        self.image = pygame.transform.rotate(self.original_image, -angle)
+        self.rect = self.image.get_rect(center=self.rect.center)
+        self.rect.center = pos
+        self.radius = radius
+        self.angle = angle
+        self.pos = vec(pos)
+        self.translate = translate
+
+    def update(self):
+        if self.translate:
+            self.pos -= speed_vec
+            self.rect.center = self.pos
 
         screen.blit(self.image, self.rect)
 
@@ -240,6 +441,7 @@ class Asteroid(pygame.sprite.Sprite):
     def destroy(self):
         self.kill()
 
+
 class Meteor(pygame.sprite.Sprite):
 
     def __init__(self, pos, radius, speed):
@@ -278,7 +480,8 @@ class Meteor(pygame.sprite.Sprite):
 
     def destroy(self):
         (x, y) = self.rect.center
-        if pygame.mixer.get_init():
+        thrust_on.stop()
+        if setting_sound_effects:
             self.explosion_sound.play(maxtime=1000)
 
         self.explosion = Explosion(x, y, 60)
@@ -288,33 +491,94 @@ class Meteor(pygame.sprite.Sprite):
         self.kill()
         self.explosion.kill()
 
-class WormHole(pygame.sprite.Sprite):
 
-    def __init__(self, pos, angle, radius, translate=False):
+class Explosion(pygame.sprite.Sprite):
+
+    def __init__(self, x, y, radius=-1):
+        pygame.sprite.Sprite.__init__(self)
+        sheet = pygame.image.load('Sprites/enemy_explode.png')
+        self.images = []
+        for i in range(0, 768, 48):
+            rect = pygame.Rect((i, 0, 48, 48))
+            image = pygame.Surface(rect.size)
+            image = image.convert()
+            colorkey = image.get_at((10, 10))
+            image.set_colorkey(colorkey, RLEACCEL)
+
+            image.blit(sheet, (0, 0), rect)
+            if radius != -1:
+                image = pygame.transform.scale(image, (radius, radius))
+
+            self.images.append(image)
+
+        print("len(self.images)")
+        print(len(self.images))
+
+        self.image = self.images[0]
+        self.index = 0
+        print("self.index")
+        print(self.index)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        screen.blit(self.image, self.rect)
+        pygame.display.update()
+
+    def update(self):
+        self.image = self.images[self.index]
+        screen.blit(self.image, self.rect)
+        pygame.display.update()
+        print("self.index")
+        print(self.index)
+        print("len(self.images)")
+        print(len(self.images))
+        if self.index + 1 >= len(self.images):
+            self.index = 0
+        else:
+            self.index += 1
+
+
+class Ship(pygame.sprite.Sprite):
+
+    def __init__(self, img, rect, pos, angle, rot_radius=0, offset=0, sign="-", angle_speed=0, translate=False, rotate=False):
         pygame.sprite.Sprite.__init__(self)
 
-        (self.original_image, self.rect) = load_image('wormhole.jpg', radius,
-                                                      radius * 0.45, white)
-
-        self.image = pygame.transform.rotate(self.original_image, -angle)
-        self.rect = self.image.get_rect(center=self.rect.center)
+        self.image, self.rect = img, rect
+        self.original_image = self.image
+        if not angle == 0:
+            self.image = pygame.transform.rotate(self.original_image, -angle)
+            self.rect = self.image.get_rect(center=self.rect.center)
         self.rect.center = pos
-        self.radius = radius
-        self.angle = angle
         self.pos = vec(pos)
         self.translate = translate
+        self.rotate = rotate
+        self.sign = sign
+
+        if self.sign == "-":
+            self.offset = vec(-rot_radius, offset)
+        else:
+            self.offset = vec(rot_radius, offset)
+        self.angle = 0
+        self.angle_speed = angle_speed
+        self.rect.center = pos
 
     def update(self):
         if self.translate:
             self.pos -= speed_vec
             self.rect.center = self.pos
 
+        if self.rotate:
+            if self.sign == "-":
+                self.angle -= self.angle_speed
+            else:
+                self.angle += self.angle_speed
+            self.rect.center = self.pos + self.offset.rotate(self.angle)
+
         screen.blit(self.image, self.rect)
 
 
 class Player(pygame.sprite.Sprite):
 
-    def __init__(self, pos):
+    def __init__(self, pos, translate=False):
         pygame.sprite.Sprite.__init__(self)
 
         (self.image, self.rect) = load_image('ship.png', 40,
@@ -331,14 +595,15 @@ class Player(pygame.sprite.Sprite):
         self.fuel = 0
         self.maxfuel = 0
         self.gameOver = False
-        self.isGravity = False
+        self.throughWormhole = False
         self.explosion_sound = pygame.mixer.Sound('Sprites/explosion.wav')
         self.explosion_sound.set_volume(0.1)
-        self.flame_up = flame(40,80,self,1)
-        self.flame_down = flame(40,80,self,4)
-        self.flame_right = flame(40,40,self,3)
-        self.flame_left = flame(40,40,self,2)
+        self.flame_up = flame(40, 80, self, 1)
+        self.flame_down = flame(40, 80, self, 4)
+        self.flame_right = flame(40, 40, self, 3)
+        self.flame_left = flame(40, 40, self, 2)
         self.rect.center = pos
+        self.translate = translate
         # screen.blit(self.image, self.rect)
 
     def rotate(self):
@@ -351,25 +616,33 @@ class Player(pygame.sprite.Sprite):
             self.angle += 360
         self.image = pygame.transform.rotate(self.original_image, -self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)
+        if self.throughWormhole:
+            self.angle_speed = 0
+            self.throughWormhole = False
 
     def checkbounds(self):
         global gameovermenu
-        if self.rect.left > width:
-            self.gameOver = True
-            gameovermenu = True
-            game_over()
-        if self.rect.right < 0:
-            self.gameOver = True
-            gameovermenu = True
-            game_over()
-        if self.rect.top > height:
-            self.gameOver = True
-            gameovermenu = True
-            game_over()
-        if self.rect.bottom < 0:
-            self.gameOver = True
-            gameovermenu = True
-            game_over()
+        if not self.translate:
+            if self.rect.left > width:
+                lvl_music.stop()
+                self.gameOver = True
+                gameovermenu = True
+                game_over()
+            if self.rect.right < 0:
+                lvl_music.stop()
+                self.gameOver = True
+                gameovermenu = True
+                game_over()
+            if self.rect.top > height:
+                lvl_music.stop()
+                self.gameOver = True
+                gameovermenu = True
+                game_over()
+            if self.rect.bottom < 0:
+                lvl_music.stop()
+                self.gameOver = True
+                gameovermenu = True
+                game_over()
 
     def update(self):
         self.checkbounds()
@@ -379,20 +652,28 @@ class Player(pygame.sprite.Sprite):
             self.rotate()
             self.fuel -= 0.01
             self.flame_left.update(self)
+            if setting_sound_effects:
+                thrust_on.play()
         if keys[K_RIGHT]:
             self.angle_speed = 1
             self.rotate()
             self.fuel -= 0.01
             self.flame_right.update(self)
+            if setting_sound_effects:
+                thrust_on.play()
         if keys[K_UP]:
             self.vel += self.acceleration
             self.fuel -= 0.05
             self.flame_up.update(self)
+            if setting_sound_effects:
+                thrust_on.play()
 
         if keys[K_DOWN]:
             self.vel -= self.acceleration
             self.fuel -= 0.05
             self.flame_down.update(self)
+            if setting_sound_effects:
+                thrust_on.play()
         if keys[K_SPACE]:
             brake_vector = vec(-(self.vel.x * 0.1), -(self.vel.y * 0.1))
             self.vel += brake_vector
@@ -401,20 +682,20 @@ class Player(pygame.sprite.Sprite):
             self.flame_down.update(self)
             self.flame_right.update(self)
             self.flame_left.update(self)
+            if setting_sound_effects:
+                thrust_on.play()
         if keys[K_ESCAPE]:
             self.gameOver = True
             global gameovermenu
             gameovermenu = True
             game_over()
 
+
+
+
         # for event in pygame.event.get():
         #     if event.type == pygame.KEYUP:
-                # if event.key == pygame.K_UP:
-                #
-                # if event.key == pygame.K_DOWN:
-                # if event.key == pygame.K_LEFT:
-                # if event.key == pygame.K_RIGHT:
-                # if event.key == pygame.K_SPACE:
+        #         if event.key == pygame.K_UP or event.key == pygame.K_DOWN or event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_SPACE:
 
         # max speed
         if self.vel.length() > MAX_SPEED:
@@ -422,25 +703,38 @@ class Player(pygame.sprite.Sprite):
 
         global speed_vec
         speed_vec = self.vel
-        self.position += self.vel
+        if self.translate:
+            self.position += self.vel * 0.05
+        else:
+            self.position += self.vel
+
         self.rect.center = self.position
 
         screen.blit(self.image, self.rect)
 
-
-    def explode(self):
+    def explode(self, blackhole=False):
         (x, y) = self.rect.center
-        if pygame.mixer.get_init():
-            self.explosion_sound.play(maxtime=1000)
+        # if pygame.mixer.get_init():
+        lvl_music.stop()
+        final_lvl_music.stop()
+        if setting_sound_effects:
+            if blackhole:
+                thrust_on.stop()
+                blackhole_effect.play()
+            else:
+                thrust_on.stop()
+                explosion_effect.play(maxtime=1000)
 
         self.explosion = Explosion(x, y, 60)
-        for i in range(0,30):
+        for i in range(0, 50):
             self.explosion.update()
+
         self.kill()
         self.explosion.kill()
         self.gameOver = True
         global gameovermenu
         gameovermenu = True
+        game_over()
 
     def gravity(self, planet, gravity_const):
         # self.vel += self.low_acceleration
@@ -449,7 +743,7 @@ class Player(pygame.sprite.Sprite):
         # else:
         #     self.angle_speed = -0.5
         gravity_const = gravity_const
-        self.rotate()
+        # self.rotate()
         dx = self.position.x - planet.rect.centerx
         dy = self.position.y - planet.rect.centery
         distance = math.hypot(dx, dy)
@@ -475,17 +769,21 @@ class Player(pygame.sprite.Sprite):
             if not 8 < abs(angle_btw) < 10:
                 if planet.rect.left - self.rect.x > planet.rect.right - self.rect.x:
                     if 230 < self.angle or self.angle < 60:
-                        self.angle_speed = (angle_btw * angle_constant) / planet.radius
+                        self.angle_speed = (
+                                                   angle_btw * angle_constant) / planet.radius
                         # self.vel += self.low_acceleration
                     else:
-                        self.angle_speed = -(angle_btw * angle_constant) / planet.radius
+                        self.angle_speed = -(
+                                angle_btw * angle_constant) / planet.radius
                         # self.vel -= self.low_acceleration
                 else:
                     if 230 < self.angle or self.angle < 60:
-                        self.angle_speed = -(angle_btw * NORMAL_GRAVITY * self.vel.magnitude() * 2) / planet.radius
+                        self.angle_speed = -(
+                                angle_btw * gravity_const * self.vel.magnitude() * 2) / planet.radius
                         # self.vel -= self.low_acceleration
                     else:
-                        self.angle_speed = (angle_btw * NORMAL_GRAVITY * self.vel.magnitude() * 2) / planet.radius
+                        self.angle_speed = (
+                                                   angle_btw * gravity_const * self.vel.magnitude() * 2) / planet.radius
                         # self.vel += self.low_acceleration
 
             # self.vel *= 1.009
@@ -519,19 +817,24 @@ class Player(pygame.sprite.Sprite):
         if self.fuel > self.maxfuel:
             self.fuel = self.maxfuel
 
+
 class flame(pygame.sprite.Sprite):
 
     def __init__(self, width, length, user, direction):
         pygame.sprite.Sprite.__init__(self)
 
         if direction == 1:
-            (self.image, self.rect) = load_image('flame_up.png', width, length, -1)
+            (self.image, self.rect) = load_image('flame_up.png', width, length,
+                                                 -1)
         elif direction == 2:
-            (self.image, self.rect) = load_image('flame_right.png', width, length, -1)
+            (self.image, self.rect) = load_image('flame_right.png', width,
+                                                 length, -1)
         elif direction == 3:
-            (self.image, self.rect) = load_image('flame_left.png', width, length, -1)
+            (self.image, self.rect) = load_image('flame_left.png', width,
+                                                 length, -1)
         elif direction == 4:
-            (self.image, self.rect) = load_image('flame_down.png', width, length, -1)
+            (self.image, self.rect) = load_image('flame_down.png', width,
+                                                 length, -1)
 
         self.original_image = self.image
         self.rect = self.image.get_rect(center=self.rect.center)
@@ -547,7 +850,110 @@ class flame(pygame.sprite.Sprite):
         self.kill()
 
 
-player = Player(screen.get_rect().center)
+# player = Player()
+
+
+# starfield1 = stars(1, white, 50, 5)
+
+
+# def game():
+#     global running
+#     global gameovermenu
+#
+#     player = Player()
+#     starfield2 = stars(1, (150, 150, 150), 75, 0.5)
+#     starfield3 = stars(1, (75, 75, 75), 200, 1)
+#
+#     planet1 = Planets(100, (150, 150, 150))
+#     planetGroup = pygame.sprite.Group()
+#     planetGroup.add(planet1)
+#
+#     # blackhole = BlackHole(screen.get_rect().center, 200)
+#     # blackholeGroup = pygame.sprite.Group()
+#     # blackholeGroup.add(blackhole)
+#
+#     # wormhole = WormHole(screen.get_rect().center, 200)
+#     # wormholeGroup = pygame.sprite.Group()
+#     # wormholeGroup.add(wormhole)
+#
+#     playerGroup = pygame.sprite.Group()
+#     playerGroup.add(player)
+#
+#
+#     asteroidGroup = pygame.sprite.Group()
+#     # for i in range(0,10):
+#     rot_radius = random.randrange(500, 1200)
+#     pos = (random.randrange(0, screen.get_width()), random.randrange(0, screen.get_height()))
+#     asteroid = Asteroid(pos, rot_radius, asteroidGroup)
+#
+#
+#     meteorGroup = pygame.sprite.Group()
+#     meteor = Meteor((0,0), meteorGroup)
+#
+#     while running and not player.gameOver:
+#         for event in pygame.event.get():
+#
+#             if event.type == pygame.QUIT:
+#                 running = False
+#                 gameovermenu = True
+#                 game_over()
+#
+#         # for _ in pygame.sprite.collide_mask(playerGroup, planetGroup, False, False):
+#         #     player.gameOver = True
+#         #     mainmenu = True
+#
+#         planet_collided_sprites = pygame.sprite.groupcollide(
+#             planetGroup, playerGroup, False, False,
+#             collided=vicinity_collision)
+#
+#         # wormhole_collided_sprites = pygame.sprite.groupcollide(
+#         #     wormholeGroup, playerGroup, False, False,
+#         #     collided=vicinity_collision)
+#
+#         if len(planet_collided_sprites) != 0:
+#             player.explode()
+#             player.gravity(planet1, NORMAL_GRAVITY)
+#
+#         # if len(wormhole_collided_sprites) != 0:
+#         #     player.gravity(wormhole, BLACK_HOLE_GRAVITY)
+#
+#         # else:
+#         #     player.isGravity = False
+#
+#         # if pygame.sprite.collide_mask(player, planet1):
+#         #     player.explode()
+#         #     player.gameOver = True
+#         #     mainmenu = True
+#
+#         screen.fill((0, 0, 0))
+#         if (player.fuel > 0):
+#             showfuelbar(player.fuel, green, [100, height - 20, player.fuel * 4, 10], 4)
+#         else:
+#             player.gameOver = True
+#             gameovermenu = True
+#             game_over()
+#
+#         planetGroup.update()
+#         playerGroup.update()
+#         # blackholeGroup.update()
+#         # wormholeGroup.update()
+#         playerGroup.draw(screen)
+#         # starfield1.drawstars()
+#         planet1.drawplanets()
+#         # wormholeGroup.draw(screen)
+#         # blackholeGroup.draw(screen)
+#         starfield2.drawstars()
+#         starfield3.drawstars()
+#         # explosions.update()
+#
+#         asteroidGroup.update()
+#         asteroidGroup.draw(screen)
+#         meteorGroup.update()
+#         meteorGroup.draw(screen)
+#         # displaytext(str(user.speed_x) + "," + str(user.speed_y) + "," + str(user.angle), 26, width / 2 + 50, height / 2
+#         #             + 43, white)
+#         pygame.display.flip()
+#         clock.tick(60)
 
 
 def main_menu():
@@ -556,6 +962,7 @@ def main_menu():
     color_normal = white
     starfield1 = stars(1, (150, 150, 150), 75, 0.5)
     starfield2 = stars(1, (75, 75, 75), 200, 1)
+    global gamefinishscreen
     global mainmenu
     global submenu
     global settingsmenu
@@ -563,12 +970,19 @@ def main_menu():
     global running
     global speed_vec
     selected = 0
+    color1 = white
+    color2 = yellow
+    color3 = yellow
+    color4 = yellow
+
     while mainmenu:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
             if event.type == pygame.KEYDOWN:
+                if setting_sound_effects:
+                    menu_select.play()
                 if event.key == pygame.K_UP:
                     selected -= 1
                 elif event.key == pygame.K_DOWN:
@@ -578,6 +992,8 @@ def main_menu():
                     if selected == 0:
                         mainmenu = False
                         submenu = True
+                        # gamefinishscreen = True
+                        # game_finished()
                         level_menu()
                     if selected == 1:
                         mainmenu = False
@@ -592,65 +1008,280 @@ def main_menu():
                         quit()
 
         screen.fill((0, 0, 0))
-        displaytext('Play', 32, width / 2 - 20, height - 400, blue)
-        displaytext('Options', 32, width / 2 - 20, height - 300, white)
-        displaytext('How To Play', 32, width / 2 - 20, height - 200, white)
-        displaytext('Exit', 32, width / 2 - 20, height - 100, white)
-
+        starfield1.drawstars()
+        starfield2.drawstars()
         if selected > 3:
             selected = 0
         if selected < 0:
             selected = 3
 
         if (selected == 0):
-            displaytext('Play', 32, width / 2 - 20, height - 400,
-                        color_selected)
-            displaytext('Options', 32, width / 2 - 20, height - 300,
-                        color_normal)
-            displaytext('How To Play', 32, width / 2 - 20, height - 200,
-                        color_normal)
-            displaytext('Exit', 32, width / 2 - 20, height - 100, color_normal)
+            color1 = white
+            color2 = yellow
+            color3 = yellow
+            color4 = yellow
         elif (selected == 1):
-            displaytext('Play', 32, width / 2 - 20, height - 400, color_normal)
-            displaytext('Options', 32, width / 2 - 20, height - 300,
-                        color_selected)
-            displaytext('How To Play', 32, width / 2 - 20, height - 200,
-                        color_normal)
-            displaytext('Exit', 32, width / 2 - 20, height - 100, color_normal)
+            color1 = yellow
+            color2 = white
+            color3 = yellow
+            color4 = yellow
         elif (selected == 2):
-            displaytext('Play', 32, width / 2 - 20, height - 400, color_normal)
-            displaytext('Options', 32, width / 2 - 20, height - 300,
-                        color_normal)
-            displaytext('How To Play', 32, width / 2 - 20, height - 200,
-                        color_selected)
-            displaytext('Exit', 32, width / 2 - 20, height - 100, color_normal)
+            color1 = yellow
+            color2 = yellow
+            color3 = white
+            color4 = yellow
         elif (selected == 3):
-            displaytext('Play', 32, width / 2 - 20, height - 400, color_normal)
-            displaytext('Options', 32, width / 2 - 20, height - 300,
-                        color_normal)
-            displaytext('How To Play', 32, width / 2 - 20, height - 200,
-                        color_normal)
-            displaytext('Exit', 32, width / 2 - 20, height - 100,
-                        color_selected)
+            color1 = yellow
+            color2 = yellow
+            color3 = yellow
+            color4 = white
+
+        main_img, main_rect = load_image("mission-interstellar-01.png", 800, 400, -1)
+        main_rect.center = (screen.get_width()/2, 200)
+        screen.blit(main_img, main_rect)
+
+        displaymenutext('Play', 25, width / 2 - 20, height - 300, color1)
+        displaymenutext('Options', 25, width / 2 - 20, height - 225, color2)
+        displaymenutext('How To Play', 25, width / 2 - 20, height - 150, color3)
+        displaymenutext('Exit', 25, width / 2 - 20, height - 75, color4)
 
         displaytext('Mission Intersteller 1.0', 12, width - 80, height - 20,
                     white)
         displaytext('Made by: Vatsal Patel', 12, width - 80, height - 10,
                     white)
+
         speed_vec = vec(0, -1)
-        starfield1.drawstars()
-        starfield2.drawstars()
         pygame.display.update()
         clock.tick(60)
 
 
+def buttons_draw(buttons):
+    for b in buttons:
+        b.draw()
+
+
+def settings():
+    starfield1 = stars(1, (150, 150, 150), 75, 0.5)
+    starfield2 = stars(1, (75, 75, 75), 200, 1)
+    buttons = []
+    global mainmenu
+    global settingsmenu
+    global setting_music
+    global setting_sound_effects
+    global speed_vec
+
+    button1 = Button('On', 100, 40, (width / 2 + 50, height - 420), 5,
+                     setting_music)
+    button2 = Button('On', 100, 40, (width / 2 + 50, height - 320), 5,
+                     setting_sound_effects)
+    buttons.append(button1)
+    buttons.append(button2)
+
+    while settingsmenu:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                mainmenu = True
+                settingsmenu = False
+                main_menu()
+            if event.type == pygame.KEYDOWN:
+                if setting_sound_effects:
+                    menu_select.play()
+                if event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
+                    mainmenu = True
+                    settingsmenu = False
+                    main_menu()
+
+        screen.fill((0, 0, 0))
+        starfield1.drawstars()
+        starfield2.drawstars()
+        displaymenutext('Music', 20, width / 2 - 90, height - 400, white)
+        displaymenutext('Sound Effects', 20, width / 2 - 90, height - 300, white)
+
+
+        displaymenutext('Use Mouse for selection', 15, width/2, height - 100,
+                    white)
+
+        displaytext('Mission Intersteller 1.0', 12, width - 80, height - 20,
+                    white)
+        displaytext('Made by: Vatsal Patel', 12, width - 80, height - 10,
+                    white)
+
+        speed_vec = vec(0, -1)
+
+        setting_music = button1.check_click()
+        setting_sound_effects = button2.check_click()
+
+        buttons_draw(buttons)
+        pygame.display.update()
+        clock.tick(5)
+
+
+def howtoplay():
+    starfield1 = stars(1, (150, 150, 150), 75, 0.5)
+    starfield2 = stars(1, (75, 75, 75), 200, 1)
+
+    global mainmenu
+    global howtoplaymenu
+    global speed_vec
+    speed_vec = vec(0, -1)
+
+    scroll_up = True
+    scroll_down = True
+
+    window_offset = 0
+
+    while howtoplaymenu:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                mainmenu = True
+                howtoplaymenu = False
+                main_menu()
+
+        keys = pygame.key.get_pressed()
+        if scroll_down:
+            if keys[K_UP]:
+                window_offset -= 5
+                speed_vec += vec(0, -0.04)
+        if scroll_up:
+            if keys[K_DOWN]:
+                window_offset += 5
+                speed_vec -= vec(0, -0.04)
+        if keys[K_ESCAPE] or keys[K_BACKSPACE]:
+            mainmenu = True
+            howtoplaymenu = False
+            main_menu()
+
+        screen.fill((0, 0, 0))
+
+        starfield1.drawstars()
+        starfield2.drawstars()
+
+        ship, ship_rect = load_image("ship.png", 100, 100, -1)
+        ship_rect.center = (100, 150)
+        ship_rect.centery += window_offset
+        screen.blit(ship, ship_rect)
+
+        planet, planet_rect = load_image("Planets/planet2.png", 100, 100, -1)
+        planet_rect.center = (100, 400)
+        planet_rect.centery += window_offset
+        screen.blit(planet, planet_rect)
+
+        asteroid, asteroid_rect = load_image("Asteroids/asteroid.png", 100, 100, -1)
+        asteroid_rect.center = (100, 650)
+        asteroid_rect.centery += window_offset
+        screen.blit(asteroid, asteroid_rect)
+
+        meteor, meteor_rect = load_image("Meteors/meteor.png", 50, 100, -1)
+        meteor_rect.center = (100, 900)
+        meteor_rect.centery += window_offset
+        screen.blit(meteor, meteor_rect)
+
+        blackhole, blackhole_rect = load_image("blackhole.png", 200, (150*0.6), -1)
+        blackhole_rect.center = (100, 1150)
+        blackhole_rect.centery += window_offset
+        screen.blit(blackhole, blackhole_rect)
+
+        wormhole, wormhole_rect = load_image("wormhole.png", 150, (150*0.65), -1)
+        wormhole_rect.center = (100, 1400)
+        wormhole_rect.centery += window_offset
+        screen.blit(wormhole, wormhole_rect)
+
+        # border = pygame.Rect((400, 40 + window_offset),
+        #                      (width / 2, height / 2))
+        # pygame.draw.rect(screen, blue, border, 2, border_radius=12)
+        displaymenutext('Player Spaceship', 25, screen.get_width()/2, ship_rect.top - 50, white)
+        displaytext('Use Arrows keys for the movement and SPACE key for the brakes', 24, screen.get_width()/2,
+                    ship_rect.top + 30, yellow)
+        displaytext('Turning requires minimum fuel while brakes require maximum fuel.', 24, screen.get_width()/2,
+                    ship_rect.top + 60, yellow)
+
+
+        displaymenutext('Planets', 25, screen.get_width()/2, planet_rect.top - 50, white)
+        displaytext('Planets vary in different radius and surface types but all planets possess ', 24, screen.get_width()/2,
+                    planet_rect.top + 30, yellow)
+        displaytext('gravitational power that can pull and destroy the spaceship. But this gravity', 24, screen.get_width()/2,
+                    planet_rect.top + 60, yellow)
+        displaytext('can also be used to propel the spaceship.', 24, screen.get_width()/2,
+                    planet_rect.top + 90, yellow)
+
+        displaymenutext('Asteroids', 25, screen.get_width()/2, asteroid_rect.top - 50, white)
+        displaytext('Asteroids revolve around planets and blackholes vary. Asteroids vary',
+            24, screen.get_width()/2, asteroid_rect.top + 30, yellow)
+        displaytext('in different radius, surface types and speed of revolution but asteroids can',
+            24, screen.get_width()/2, asteroid_rect.top + 60, yellow)
+        displaytext(' destroy the spaceship on collision. So avoid going near them',
+            24, screen.get_width()/2, asteroid_rect.top + 90, yellow)
+
+        displaymenutext('Meteors', 25, screen.get_width() / 2,
+                    meteor_rect.top - 50, white)
+        displaytext(
+            'Meteors travel in group in the space. Meteors vary in different shape, sizes,',
+            24, screen.get_width()/2, meteor_rect.top + 30, yellow)
+        displaytext(
+            'speed and trails. An alert occurs 5 secs before the meteors shower. Meteors can',
+            24, screen.get_width()/2, meteor_rect.top + 60, yellow)
+        displaytext('destroy the spaceship on collision. Asteroids can help against meteors.',
+                    24, screen.get_width()/2, meteor_rect.top + 90,
+                    yellow)
+
+        displaymenutext('Black Hole', 25, screen.get_width() / 2,
+                    blackhole_rect.top - 50, white)
+        displaytext(
+            'Black Hole is a region in the space with very strong gravity.',
+            24, screen.get_width()/2, blackhole_rect.top + 20, yellow)
+        displaytext(
+            'Blackholes have big radius of gravity and can pull the spaceship ',
+            24, screen.get_width()/2, blackhole_rect.top + 50, yellow)
+        displaytext(
+            'from large distance. Once pulled in spaceship cannot',
+            24, screen.get_width()/2, blackhole_rect.top + 80,
+            yellow)
+        displaytext(
+            'escape from blackhole',
+            24, screen.get_width()/2, blackhole_rect.top + 110,
+            yellow)
+
+
+        displaymenutext('Worm Hole', 25, screen.get_width() / 2,
+                    wormhole_rect.top - 50, white)
+        displaytext(
+            'Worm hole resembles a tunnel between two points in space-time.',
+            24, screen.get_width()/2, wormhole_rect.top + 30, yellow)
+        displaytext(
+            'It provides a shortcut by shorter path. It can be used to reach',
+            24, screen.get_width()/2, wormhole_rect.top + 60, yellow)
+        displaytext(
+            'some other point in space without using fuel',
+            24, screen.get_width()/2, wormhole_rect.top + 90,
+            yellow)
+
+        displaytext('Mission Intersteller 1.0', 12, width - 80, height - 20,
+                    white)
+        displaytext('Made by: Vatsal Patel', 12, width - 80, height - 10,
+                    white)
+
+        if screen.get_height() - wormhole_rect.bottom > 50:
+            scroll_down = False
+        else:
+            scroll_down = True
+
+        print(ship_rect.top)
+        if ship_rect.top > 50:
+            scroll_up = False
+        else:
+            scroll_up = True
+
+        pygame.display.update()
+        clock.tick(120)
+
+
 def level_menu():
     print("Submenu")
-    color1 = blue
-    color2 = white
-    color3 = white
-    color4 = white
-    color5 = white
+    color1 = white
+    color2 = yellow
+    color3 = yellow
+    color4 = yellow
+    color5 = yellow
 
     starfield1 = stars(1, (150, 150, 150), 75, 0.5)
     starfield2 = stars(1, (75, 75, 75), 200, 1)
@@ -667,6 +1298,8 @@ def level_menu():
                 pygame.quit()
                 quit()
             if event.type == pygame.KEYDOWN:
+                if setting_sound_effects:
+                    menu_select.play()
                 if event.key == pygame.K_UP:
                     selected -= 1
                 elif event.key == pygame.K_DOWN:
@@ -692,57 +1325,78 @@ def level_menu():
                         level_5()
 
         screen.fill((0, 0, 0))
+        starfield1.drawstars()
+        starfield2.drawstars()
         if selected > 4:
             selected = 0
         if selected < 0:
             selected = 4
 
         if (selected == 0):
-            color1 = blue
-            color2 = white
-            color3 = white
-            color4 = white
-            color5 = white
+            color1 = white
+            color2 = yellow
+            color3 = yellow
+            color4 = yellow
+            color5 = yellow
         elif (selected == 1):
-            color1 = white
-            color2 = blue
-            color3 = white
-            color4 = white
-            color5 = white
+            color1 = yellow
+            color2 = white
+            color3 = yellow
+            color4 = yellow
+            color5 = yellow
         elif (selected == 2):
-            color1 = white
-            color2 = white
-            color3 = blue
-            color4 = white
-            color5 = white
+            color1 = yellow
+            color2 = yellow
+            color3 = white
+            color4 = yellow
+            color5 = yellow
         elif (selected == 3):
-            color1 = white
-            color2 = white
-            color3 = white
-            color4 = blue
-            color5 = white
-        elif (selected == 4):
-            color1 = white
-            color2 = white
-            color3 = white
+            color1 = yellow
+            color2 = yellow
+            color3 = yellow
             color4 = white
-            color5 = blue
+            color5 = yellow
+        elif (selected == 4):
+            color1 = yellow
+            color2 = yellow
+            color3 = yellow
+            color4 = yellow
+            color5 = white
 
-        displaytext('Level 1', 32, width / 2 - 20, height - 500, color1)
-        displaytext('Level 2', 32, width / 2 - 20, height - 450, color2)
-        displaytext('Level 3', 32, width / 2 - 20, height - 400, color3)
-        displaytext('Level 4', 32, width / 2 - 20, height - 350, color4)
-        displaytext('Level 5', 32, width / 2 - 20, height - 300, color5)
+        main_img, main_rect = load_image("mission-interstellar-01.png", 800,
+                                         400, -1)
+        main_rect.center = (screen.get_width() / 2, 200)
+        screen.blit(main_img, main_rect)
+
+        displaymenutext('Level 1', 25, width / 2 - 20, height - 350, color1)
+        displaymenutext('Level 2', 25, width / 2 - 20, height - 275, color2)
+        displaymenutext('Level 3', 25, width / 2 - 20, height - 200, color3)
+        displaymenutext('Level 4', 25, width / 2 - 20, height - 125, color4)
+        displaymenutext('Level 5', 25, width / 2 - 20, height - 50, color5)
+
         displaytext('Mission Intersteller 1.0', 12, width - 80, height - 20,
                     white)
         displaytext('Made by: Vatsal Patel', 12, width - 80, height - 10,
                     white)
 
         speed_vec = vec(0, -1)
-        starfield1.drawstars()
-        starfield2.drawstars()
         pygame.display.update()
         clock.tick(60)
+
+
+def intro_text_level_1():
+    screen.fill(black)
+    displayanimtext('this is line number 1 ',
+                    (0, 1))  # text string and x, y coordinate tuple.
+    displayanimtext('this is line number 2', (0, 2))
+    displayanimtext('this is line number 3', (0, 3))
+    displayanimtext('', (0, 3))
+
+    for event in pygame.event.get():
+        if event.type == KEYDOWN:
+            if event.key == K_RETURN:
+                return False
+
 
 def level_1():
     global running
@@ -765,12 +1419,14 @@ def level_1():
 
     planetGroup = pygame.sprite.Group()
 
+    # planet1 = Planets(100, (400, 450))
     planet2 = Planets(200, (100, 600))
     planet3 = Planets(250, (600, 700))
     planet4 = Planets(100, (300, 100))
     planet5 = Planets(125, (800, 200))
-    target_planet = Planets(100, (1000, 500), True)
+    target_planet = Planets(100, (900, 500), True)
 
+    # planetGroup.add(planet1)
     planetGroup.add(planet2)
     planetGroup.add(planet3)
     planetGroup.add(planet4)
@@ -779,27 +1435,57 @@ def level_1():
     playerGroup = pygame.sprite.Group()
     playerGroup.add(player)
 
+    # fuelpack1 = Fuelpack((200, 600))
+    # fuelpack2 = Fuelpack((500, 100))
+    # fuelpack3 = Fuelpack((1000, 100))
+    # fuelpackGroup = pygame.sprite.Group()
+    # fuelpackGroup.add(fuelpack1)
+    # fuelpackGroup.add(fuelpack2)
+    # fuelpackGroup.add(fuelpack3)
+
     while running and not player.gameOver:
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
+                lvl_music.stop()
                 running = False
                 gameovermenu = True
                 game_over()
 
+        # if pygame.sprite.collide_mask(player, planet1):
+        #     player.explode()
         for planet in planetGroup:
             if pygame.sprite.collide_mask(player, planet):
                 player.explode()
-
+        # if pygame.sprite.collide_mask(player, planet3):
+        #     player.explode()
+        # if pygame.sprite.collide_mask(player, planet4):
+        #     player.explode()
+        # if pygame.sprite.collide_mask(player, planet5):
+        #     player.explode()
         if pygame.sprite.collide_mask(player, target_planet):
             if player.vel.magnitude() > 1:
                 player.explode()
             else:
+                lvl_music.stop()
                 thrust_on.stop()
-                lvl_complete_effect.play()
+                if setting_sound_effects:
+                    lvl_complete_effect.play()
                 lvlfinishmenu = True
                 player.gameOver = True
                 lvl_finished()
+
+        # if pygame.sprite.collide_mask(player, fuelpack1):
+        #     fuelpack1.kill()
+        #     player.addFuel(5)
+        #
+        # if pygame.sprite.collide_mask(player, fuelpack2):
+        #     fuelpack2.kill()
+        #     player.addFuel(5)
+        #
+        # if pygame.sprite.collide_mask(player, fuelpack3):
+        #     fuelpack3.kill()
+        #     player.addFuel(5)
 
         planet_collided_sprites = pygame.sprite.groupcollide(planetGroup,
                                                              playerGroup,
@@ -817,23 +1503,31 @@ def level_1():
         planetGroup.update()
         planetGroup.draw(screen)
         target_planet.update()
+        # playerGroup.draw(screen)
+        # planetGroup.draw(screen)
+        # fuelpackGroup.draw(screen)
+        # planetGroup.update()
+        # playerGroup.update()
+        # fuelpack1.drawfuelpack()
+        # fuelpackGroup.update()
         player.update()
 
         if showintro:
             pygame.display.update()
-            border = pygame.Rect((50, height - 100), (width - 100, 70))
-            textbox = pygame.Rect((50, height - 100), (width - 100, 70))
+            border = pygame.Rect((50, height - 120), (width - 100, 90))
+            textbox = pygame.Rect((50, height - 120), (width - 100, 90))
             pygame.draw.rect(screen, black, textbox, border_radius=12)
             pygame.draw.rect(screen, green, border, 2, border_radius=12)
             pygame.display.update()
             if setting_sound_effects:
                 intro_printing.play(-1)
 
-            displayanimtext('TARS:', (60, 42.5))
-            displayanimtext('Hello Captain Cooper. Earth is no more habitable, so you are directed to take the Endurance ship with 1000 frozen human embryos and reach the planet, Pandora.', (
-                100, 42.5))  # text string and x, y coordinate tuple.
-            displayanimtext('Our previous teams have landed there. You might find their spaceship. Are you ready to save humanity? ', (100, 43.5))
-            displayanimtext('Press ENTER to continue', (800, 44.5))
+            displayanimtext('TARS:', (60, 41))
+            displayanimtext('Hello Captain Cooper. Earth is no more habitable, so you are directed to take the Endurance', (
+                110, 41))  # text string and x, y coordinate tuple.
+            displayanimtext('ship with 1000 frozen human embryos and reach the planet, Pandora. Our previous teams have', (110, 42))
+            displayanimtext('landed there. You might find their spaceship. Are you ready to save humanity? ', (110, 43))
+            displayanimtext('Press ENTER to continue', (700, 44.5))
             intro_printing.stop()
 
             while showintro:
@@ -841,19 +1535,21 @@ def level_1():
                     if event.type == KEYDOWN:
                         if event.key == K_RETURN:
                             showintro = False
-                            # if setting_music:
-                                # bg_music.play(-1)
+                            if setting_music:
+                                lvl_music.play(-1)
 
         showfuelbar(player, [100, height - 20, player.fuel * (900/player.maxfuel), 10])
 
 
         if player.fuel <= 0:
+            lvl_music.stop()
             player.gameOver = True
             gameovermenu = True
             game_over()
 
         pygame.display.flip()
         clock.tick(60)
+
 
 def createmeteorWave(num, posx):
     meteors = []
@@ -947,6 +1643,7 @@ def level_2():
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
+                lvl_music.stop()
                 running = False
                 gameovermenu = True
                 game_over()
@@ -968,8 +1665,10 @@ def level_2():
             if player.vel.magnitude() > 1:
                 player.explode()
             else:
+                lvl_music.stop()
                 thrust_on.stop()
-                lvl_complete_effect.play()
+                if setting_sound_effects:
+                    lvl_complete_effect.play()
                 lvlfinishmenu = True
                 player.gameOver = True
                 lvl_finished()
@@ -1035,17 +1734,20 @@ def level_2():
 
         if showintro:
             pygame.display.update()
-            border = pygame.Rect((50, height - 100), (width - 100, 70))
-            textbox = pygame.Rect((50, height - 100), (width - 100, 70))
+            border = pygame.Rect((50, height - 120), (width - 100, 100))
+            textbox = pygame.Rect((50, height - 120), (width - 100, 100))
             pygame.draw.rect(screen, black, textbox, border_radius=12)
             pygame.draw.rect(screen, green, border, 2, border_radius=12)
             pygame.display.update()
             if setting_sound_effects:
                 intro_printing.play(-1)
-            displayanimtext('Heyy Captain Cooper it seems you are ready for the next mission. Your next mission is to land on the Krypton planet. Due to the asteroids and meteors, our previous', (
-                60, 42.5))  # text string and x, y coordinate tuple.
-            displayanimtext('team crashed before reaching there. If you find the planet habitable drop the rover, and base station and send SOS signal. Keep the hope alive.', (60, 43.5))
-            displayanimtext('Press ENTER to continue', (800, 44.5))
+            displayanimtext('TARS:', (60, 41))
+            displayanimtext('Heyy Captain Cooper it seems you are ready for the next mission. Your next mission is to land', (
+                110, 41))  # text string and x, y coordinate tuple.
+            displayanimtext('on the Krypton planet. Due to the asteroids and meteors, our previous team crashed before', (110, 42))  # text string and x, y coordinate tuple.
+            displayanimtext('reaching there. If you find the planet habitable drop the rover, and base station and send', (110, 43))
+            displayanimtext('SOS signal. Keep the hope alive.', (110, 44))
+            displayanimtext('Press ENTER to continue', (700, 45.5))
             intro_printing.stop()
 
             while showintro:
@@ -1055,7 +1757,7 @@ def level_2():
                             showintro = False
                             start_time = pygame.time.get_ticks()
                             if setting_music:
-                                bg_music.play(-1)
+                                lvl_music.play(-1)
 
         if start_time:
             time_since_enter = pygame.time.get_ticks() - start_time
@@ -1066,8 +1768,9 @@ def level_2():
                 timercount += 1
                 meteorWarning = False
                 meteorWave = True
-                global warning_effect
-                warning_effect.play()
+                if setting_sound_effects:
+                    global warning_effect
+                    warning_effect.play()
                 meteors, meteorGroup = createmeteorWave(15,
                                                         player.rect.centerx)
                 # for meteor in meteors:
@@ -1080,6 +1783,7 @@ def level_2():
 
 
         if player.fuel <= 0:
+            lvl_music.stop()
             player.gameOver = True
             gameovermenu = True
             game_over()
@@ -1099,6 +1803,7 @@ def level_2():
                 meteorWave = False
         pygame.display.flip()
         clock.tick(60)
+
 
 def level_3():
     global running
@@ -1144,6 +1849,7 @@ def level_3():
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
+                lvl_music.stop()
                 running = False
                 gameovermenu = True
                 game_over()
@@ -1163,8 +1869,10 @@ def level_3():
             if player.vel.magnitude() > 1:
                 player.explode()
             else:
+                lvl_music.stop()
                 thrust_on.stop()
-                lvl_complete_effect.play()
+                if setting_sound_effects:
+                    lvl_complete_effect.play()
                 lvlfinishmenu = True
                 player.gameOver = True
                 lvl_finished()
@@ -1217,22 +1925,24 @@ def level_3():
 
         if showintro:
             pygame.display.update()
-            border = pygame.Rect((50, height - 100), (width - 100, 80))
-            textbox = pygame.Rect((50, height - 100), (width - 100, 80))
+            border = pygame.Rect((50, height - 135), (width - 100, 115))
+            textbox = pygame.Rect((50, height - 135), (width - 100, 115))
             pygame.draw.rect(screen, black, textbox, border_radius=12)
             pygame.draw.rect(screen, green, border, 2, border_radius=12)
             pygame.display.update()
             if setting_sound_effects:
                 intro_printing.play(-1)
-            displayanimtext(
-                'Good to see you, Captain Cooper. Since you are so experienced a critical mission has been assigned to you that no one has endeavoured. There is a Cybertron planet on',
-                (
-                    60, 42.5))  # text string and x, y coordinate tuple.
-            displayanimtext(
-                'the far end of our galaxy. It is believed that intelligent species exist on Cybertron. Try to communicate with them to help humans. You will also encounter a massive',
-                (60, 43.5))
-            displayanimtext('Blackhole in the path, the biggest in the milky way. Avoid going near it.', (60, 44.5))
-            displayanimtext('Press ENTER to continue', (800, 45.5))
+            displayanimtext('TARS:', (60, 40))
+            displayanimtext('Good to see you, Captain Cooper. Since you are so experienced a critical mission has been',
+                (115, 40))
+            displayanimtext('assigned to you that no one has endeavoured. There is a Cybertron planet on the far end',
+                (115, 41))
+            displayanimtext('of our galaxy. It is believed that intelligent species exist on Cybertron. Try to',
+                (115, 42))
+            displayanimtext('communicate with them to help humans. You will also encounter a massive Blackhole',
+                (115, 43))
+            displayanimtext('in the path, the biggest in the milky way. Avoid going near it.', (115, 44))
+            displayanimtext('Press ENTER to continue', (700, 45))
             intro_printing.stop()
 
             while showintro:
@@ -1241,11 +1951,12 @@ def level_3():
                         if event.key == K_RETURN:
                             showintro = False
                             if setting_music:
-                                bg_music.play(-1)
+                                lvl_music.play(-1)
 
         showfuelbar(player, [100, height - 20, player.fuel*(900/player.maxfuel), 10])
 
         if player.fuel <= 0:
+            lvl_music.stop()
             player.gameOver = True
             gameovermenu = True
             game_over()
@@ -1317,6 +2028,7 @@ def level_4():
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
+                lvl_music.stop()
                 running = False
                 gameovermenu = True
                 game_over()
@@ -1336,8 +2048,10 @@ def level_4():
             if player.vel.magnitude() > 1:
                 player.explode()
             else:
+                lvl_music.stop()
                 thrust_on.stop()
-                lvl_complete_effect.play()
+                if setting_sound_effects:
+                    lvl_complete_effect.play()
                 lvlfinishmenu = True
                 player.gameOver = True
                 lvl_finished()
@@ -1437,18 +2151,22 @@ def level_4():
 
         if showintro:
             pygame.display.update()
-            border = pygame.Rect((50, height - 100), (width - 100, 80))
-            textbox = pygame.Rect((50, height - 100), (width - 100, 80))
+            border = pygame.Rect((50, height - 135), (width - 90, 115))
+            textbox = pygame.Rect((50, height - 135), (width - 90, 115))
             pygame.draw.rect(screen, black, textbox, border_radius=12)
             pygame.draw.rect(screen, green, border, 2, border_radius=12)
             pygame.display.update()
             if setting_sound_effects:
                 intro_printing.play(-1)
-            displayanimtext('Captain Cooper, there is bad news. The fuel tank was damaged by the black hole and a large amount of fuel leaked. We need to head towards Solaris about 2 lightyears', (
-                60, 42.5))  # text string and x, y coordinate tuple.
-            displayanimtext('away. We cannot reach Solaris with low fuel, so I found a wormhole in the path that can shorten our journey. Our previous team almost reached Solaris but was pulled due', (60, 43.5))
-            displayanimtext('to the strong magnetic fields at the other end of the wormhole, so be careful. Hoping to reach without collision.', (60, 44.5))
-            displayanimtext('Press ENTER to continue', (800, 45.5))
+            displayanimtext('TARS:', (60, 40))
+            displayanimtext('Captain Cooper, there is bad news. The fuel tank was damaged by the black hole and a large', (
+                115, 40))
+            displayanimtext('amount of fuel leaked. We need to head towards Solaris about 2 lightyears away. We cannot', (
+                115, 41))
+            displayanimtext('reach Solaris with low fuel, so I found a wormhole in the path that can shorten our journey.', (115, 42))
+            displayanimtext('Our previous team almost reached Solaris but was pulled due to the strong magnetic fields', (115, 43))
+            displayanimtext('fields at the other end of the wormhole, so be careful. Hoping to reach without collision.', (115, 44))
+            displayanimtext('Press ENTER to continue', (700, 45.5))
             intro_printing.stop()
 
             while showintro:
@@ -1457,8 +2175,8 @@ def level_4():
                         if event.key == K_RETURN:
                             showintro = False
                             meteor_time = pygame.time.get_ticks()
-                            # if setting_music:
-                                # bg_music.play(-1)
+                            if setting_music:
+                                lvl_music.play(-1)
 
         if meteor_time:
             time_since_enter = pygame.time.get_ticks() - meteor_time
@@ -1469,8 +2187,9 @@ def level_4():
                 timercount += 1
                 meteorWarning = False
                 meteorWave = True
-                global warning_effect
-                warning_effect.play()
+                if setting_sound_effects:
+                    global warning_effect
+                    warning_effect.play()
                 meteors, meteorGroup = createmeteorWave(15,
                                                         player.rect.centerx)
 
@@ -1487,6 +2206,7 @@ def level_4():
         showfuelbar(player, [100, height - 20, player.fuel*(900/player.maxfuel), 10])
 
         if player.fuel <= 0:
+            lvl_music.stop()
             player.gameOver = True
             gameovermenu = True
             game_over()
@@ -1527,7 +2247,6 @@ def offset(offset, planetGroup, wormholeGroup, meteorGroup, blackholeGroup, aste
         player.rect.centerx -= offset
 
     pygame.display.update()
-
 
 def level_5():
     global running
@@ -2058,9 +2777,10 @@ def level_5():
         pygame.display.flip()
         clock.tick(60)
 
+
 def game_over():
-    color1 = blue
-    color2 = white
+    color1 = white
+    color2 = yellow
 
     starfield1 = stars(1, (150, 150, 150), 75, 0.5)
     starfield2 = stars(1, (75, 75, 75), 200, 1)
@@ -2078,6 +2798,8 @@ def game_over():
                 pygame.quit()
                 quit()
             if event.type == pygame.KEYDOWN:
+                if setting_sound_effects:
+                    menu_select.play()
                 if event.key == pygame.K_LEFT:
                     selected -= 1
                 elif event.key == pygame.K_RIGHT:
@@ -2099,35 +2821,36 @@ def game_over():
                         main_menu()
 
         screen.fill((0, 0, 0))
+        starfield1.drawstars()
+        starfield2.drawstars()
         if selected > 1:
             selected = 0
         if selected < 0:
             selected = 1
 
         if (selected == 0):
-            color1 = blue
-            color2 = white
-        elif (selected == 1):
             color1 = white
-            color2 = blue
+            color2 = yellow
+        elif (selected == 1):
+            color1 = yellow
+            color2 = white
 
-        displaytext('Game Over', 64, width / 2, 100, white)
-        displaytext('Play Again', 32, width / 3 - 20, height - 400, color1)
-        displaytext('Main Menu', 32, 2 * width / 3 + 20, height - 400, color2)
+        displaymenutext('Game Over', 40, width / 2, 100, yellow)
+        displaymenutext('Play Again', 25, width / 3 - 20, height - 400, color1)
+        displaymenutext('Main Menu', 25, 2 * width / 3 + 20, height - 400, color2)
         displaytext('Mission Intersteller 1.0', 12, width - 80, height - 40,
                     white)
         displaytext('Made by: Vatsal Patel', 12, width - 80, height - 20,
                     white)
 
         speed_vec = vec(0, -1)
-        starfield1.drawstars()
-        starfield2.drawstars()
         pygame.display.update()
         clock.tick(60)
 
+
 def lvl_finished():
-    color1 = blue
-    color2 = white
+    color1 = white
+    color2 = yellow
 
     starfield1 = stars(1, (150, 150, 150), 75, 0.5)
     starfield2 = stars(1, (75, 75, 75), 200, 1)
@@ -2137,6 +2860,7 @@ def lvl_finished():
     global speed_vec
     global currentLvl
     global lvlfinishmenu
+    global gamefinishscreen
     selected = 0
 
     while lvlfinishmenu:
@@ -2145,6 +2869,8 @@ def lvl_finished():
                 pygame.quit()
                 quit()
             if event.type == pygame.KEYDOWN:
+                if setting_sound_effects:
+                    menu_select.play()
                 if event.key == pygame.K_LEFT:
                     selected -= 1
                 elif event.key == pygame.K_RIGHT:
@@ -2167,29 +2893,35 @@ def lvl_finished():
                         main_menu()
 
         screen.fill((0, 0, 0))
+        starfield1.drawstars()
+        starfield2.drawstars()
+
+        if(currentLvl == 4):
+            lvlfinishmenu = False
+            gamefinishscreen = True
+            game_finished()
+
         if selected > 1:
             selected = 0
         if selected < 0:
             selected = 1
 
         if (selected == 0):
-            color1 = blue
-            color2 = white
-        elif (selected == 1):
             color1 = white
-            color2 = blue
+            color2 = yellow
+        elif (selected == 1):
+            color1 = yellow
+            color2 = white
 
-        displaytext('Level Complete', 64, width / 2, 100, white)
-        displaytext('Next Level', 32, width / 3 - 20, height - 400, color1)
-        displaytext('Main Menu', 32, 2 * width / 3 + 20, height - 400, color2)
+        displaymenutext('Level Complete', 40, width / 2, 100, yellow)
+        displaymenutext('Next Level', 25, width / 3 - 20, height - 400, color1)
+        displaymenutext('Main Menu', 25, 2 * width / 3 + 20, height - 400, color2)
         displaytext('Mission Intersteller 1.0', 12, width - 80, height - 40,
                     white)
         displaytext('Made by: Vatsal Patel', 12, width - 80, height - 20,
                     white)
 
         speed_vec = vec(0, -1)
-        starfield1.drawstars()
-        starfield2.drawstars()
         pygame.display.update()
         clock.tick(60)
 
@@ -2214,5 +2946,140 @@ def play_lvl():
         level_5()
 
 
+def warning(text):
+    displaymenutext(text, 35
+                    , width / 2, height / 2, red)
+
+def showMeteorWarning():
+    displaymenutext("Meteor Wave Arriving", 20, screen.get_rect().centerx, 75, red)
+
+def game_finished():
+    starfield1 = stars(1, (150, 150, 150), 75, 0.5)
+    starfield2 = stars(1, (75, 75, 75), 200, 1)
+
+    global mainmenu
+    global speed_vec
+    global gamefinishscreen
+    show_finish_desc = True
+    show_final_message = False
+
+    while gamefinishscreen:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                mainmenu = True
+                gamefinishscreen = False
+                main_menu()
+            if event.type == pygame.KEYDOWN:
+                if setting_sound_effects:
+                    menu_select.play()
+
+                if event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE or event.key == pygame.K_RETURN:
+                    mainmenu = True
+                    gamefinishscreen = False
+                    main_menu()
+
+
+        screen.fill((0, 0, 0))
+        starfield1.drawstars()
+        starfield2.drawstars()
+
+        # displaytext('Level Complete', 64, width / 2, 100, white)
+        if show_finish_desc:
+            img, rect = load_image("planet_landed.jpg", screen.get_width(), screen.get_height(), -1)
+            rect.center = screen.get_rect().center
+            rect.bottom = screen.get_rect().bottom
+            print(screen.get_width())
+            print(screen.get_height())
+            screen.blit(img,rect)
+            pygame.display.update()
+            # displaytext('Next Level', 32, width / 3 - 20, height - 400, color1)
+            # displaytext('Main Menu', 32, 2 * width / 3 + 20, height - 400, color2)
+            if setting_sound_effects:
+                intro_printing.play(-1)
+            displaycustomanimtext("Congratulations", (width/2-200,5) , "Sprites/ethnocentric.otf", 30, yellow)
+            displaycustomanimtext("You have successfully completed this game and saved humanity by", (100, 20), "Sprites/ethnocentric.otf", 15, white)
+            displaycustomanimtext("rehabilitating humans on Proxima Centauri B. We will lead the ", (130, 21.5), "Sprites/ethnocentric.otf", 15, white)
+            displaycustomanimtext("mission to Pandora, Krypton, Cybertron and Solaris from the", (130, 23), "Sprites/ethnocentric.otf", 15, white)
+            displaycustomanimtext("Proxima Centauri base station. For now, rest as you have come", (120, 24.5), "Sprites/ethnocentric.otf", 15, white)
+            displaycustomanimtext("a long way.", (width/2 -50, 26), "Sprites/ethnocentric.otf", 15, white)
+            displaycustomanimtext("Press Enter", (width/2-80, 33), "Sprites/ethnocentric.otf", 20, white)
+
+            displaytext('Mission Intersteller 1.0', 12, width - 80, height - 40,
+                        white)
+            displaytext('Made by: Vatsal Patel', 12, width - 80, height - 30,
+                        white)
+            pygame.display.update()
+
+            intro_printing.stop()
+
+            while show_finish_desc:
+                for event in pygame.event.get():
+                    if event.type == KEYDOWN:
+                        if event.key == K_RETURN:
+                            show_finish_desc = False
+                            show_final_message = True
+
+        if show_final_message:
+            timercount = 0
+            screen.fill((0, 0, 0))
+            pygame.display.update()
+            img, rect = load_image("future.jpg", screen.get_width(),
+                                   screen.get_height(), -1)
+            rect.center = screen.get_rect().center
+            rect.bottom = screen.get_rect().bottom
+            print(screen.get_width())
+            print(screen.get_height())
+            screen.blit(img, rect)
+            pygame.display.update()
+            if setting_sound_effects:
+                intro_printing.play(-1)
+            displaycustomanimtext("Message from future gen", (200,5), "Sprites/ethnocentric.otf", 30, yellow)
+            displaycustomanimtext("This game is based on fiction and hoping that you enjoyed playing it.", (100, 15), "Sprites/ethnocentric.otf", 15, white)
+            displaycustomanimtext("But the reason for developing this game is to bring awareness to youth,", (80, 16.5), "Sprites/ethnocentric.otf", 15, white)
+            displaycustomanimtext("as youth is the future. This fiction is slowly turning into reality on", (100, 18), "Sprites/ethnocentric.otf", 15, white)
+            displaycustomanimtext("Earth. With every passing day, thousands of trees are being cut down,", (90, 19.5), "Sprites/ethnocentric.otf", 15, white)
+            displaycustomanimtext("numerous animal species are going extinct, water, land and air are", (100, 21), "Sprites/ethnocentric.otf", 15, white)
+            displaycustomanimtext("polluted, and there are numerous more human activities poisoning", (100, 22.5), "Sprites/ethnocentric.otf", 15, white)
+            displaycustomanimtext("the environment. Do you see your future as an intelligent civilized", (100, 24), "Sprites/ethnocentric.otf", 15, white)
+            displaycustomanimtext("interplanetary species on this path?", (300, 25.5), "Sprites/ethnocentric.otf", 15, white)
+
+            displaycustomanimtext("Definitely No. Please help restore Mother Nature, your own home. Your", (100, 29), "Sprites/ethnocentric.otf", 15, white)
+            displaycustomanimtext("small contribution can turn the fate of the whole planet collaboratively.", (70, 30.5), "Sprites/ethnocentric.otf", 15, white)
+
+            displaycustomanimtext("Follow the Reduce, Reuse, Recycle and Restore principle", (80, 35), "Sprites/ethnocentric.otf", 20, yellow)
+            displaytext('Mission Intersteller 1.0', 12, width - 80, height - 40,
+                        white)
+            displaytext('Made by: Vatsal Patel', 12, width - 80, height - 30,
+                        white)
+            slide_time = pygame.time.get_ticks()
+            pygame.display.update()
+
+            intro_printing.stop()
+
+            while show_final_message:
+                for event in pygame.event.get():
+                    if event.type == KEYDOWN:
+                        if event.key == K_RETURN:
+                            show_final_message = False
+                            mainmenu = True
+                            gamefinishscreen = False
+                            main_menu()
+
+                time_since_enter = pygame.time.get_ticks() - slide_time
+                if time_since_enter / 1000 > timercount:
+                    timercount += 1
+
+
+
+            displaytext('Mission Intersteller 1.0', 12, width - 80,
+                        height - 40,
+                        white)
+            displaytext('Made by: Vatsal Patel', 12, width - 80, height - 20,
+                        white)
+            pygame.display.update()
+
+        speed_vec = vec(0, -1)
+        pygame.display.update()
+        clock.tick(60)
 
 main_menu()

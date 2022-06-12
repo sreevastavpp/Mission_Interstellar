@@ -305,7 +305,12 @@ class Planets(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         if target:
-            (self.image, self.rect) = load_image("target_planet.png", radius,
+            files = [f for f in listdir("Sprites/Target Planets") if
+                     isfile(join("Sprites/Target Planets", f))]
+
+            file = files[random.randrange(0, len(files))]
+
+            (self.image, self.rect) = load_image(join("Target Planets", file), radius,
                                                  radius, -1)
 
         else:
@@ -981,14 +986,18 @@ def main_menu():
                 pygame.quit()
                 quit()
             if event.type == pygame.KEYDOWN:
-                if setting_sound_effects:
-                    menu_select.play()
                 if event.key == pygame.K_UP:
+                    if setting_sound_effects:
+                        menu_select.play()
                     selected -= 1
                 elif event.key == pygame.K_DOWN:
+                    if setting_sound_effects:
+                        menu_select.play()
                     selected += 1
 
                 if event.key == pygame.K_RETURN:
+                    if setting_sound_effects:
+                        menu_select.play()
                     if selected == 0:
                         mainmenu = False
                         submenu = True
@@ -1194,6 +1203,8 @@ def howtoplay():
                     ship_rect.top + 30, yellow)
         displaytext('Turning requires minimum fuel while brakes require maximum fuel.', 24, screen.get_width()/2,
                     ship_rect.top + 60, yellow)
+        displaytext('If fuel of Spaceship gets empty, player is out.', 24, screen.get_width()/2,
+                    ship_rect.top + 90, yellow)
 
 
         displaymenutext('Planets', 25, screen.get_width()/2, planet_rect.top - 50, white)
@@ -1298,18 +1309,24 @@ def level_menu():
                 pygame.quit()
                 quit()
             if event.type == pygame.KEYDOWN:
-                if setting_sound_effects:
-                    menu_select.play()
                 if event.key == pygame.K_UP:
+                    if setting_sound_effects:
+                        menu_select.play()
                     selected -= 1
                 elif event.key == pygame.K_DOWN:
+                    if setting_sound_effects:
+                        menu_select.play()
                     selected += 1
                 elif event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
+                    if setting_sound_effects:
+                        menu_select.play()
                     mainmenu = True
                     submenu = False
                     main_menu()
 
                 if event.key == pygame.K_RETURN:
+                    if setting_sound_effects:
+                        menu_select.play()
                     submenu = False
                     running = True
                     currentLvl = selected
@@ -1528,6 +1545,11 @@ def level_1():
             displayanimtext('ship with 1000 frozen human embryos and reach the planet, Pandora. Our previous teams have', (110, 42))
             displayanimtext('landed there. You might find their spaceship. Are you ready to save humanity? ', (110, 43))
             displayanimtext('Press ENTER to continue', (700, 44.5))
+            arrow_img, arrow_rect = load_image("arrow.png",20,20,-1)
+            arrow_rect.center = (target_planet.rect.centerx, target_planet.rect.centery+60)
+            screen.blit(arrow_img,arrow_rect)
+            pygame.display.update()
+            displaycustomanimtext('Target Planet',(target_planet.pos.x - 80, 36), "Sprites/ethnocentric.otf", 15, yellow)
             intro_printing.stop()
 
             while showintro:
@@ -1555,8 +1577,8 @@ def createmeteorWave(num, posx):
     meteors = []
     mtg = pygame.sprite.Group()
     for i in range(num):
-        randx = random.randrange(-200, screen.get_width()-200)
-        randy = random.randrange(0, 100) - 150
+        randx = random.randrange(posx-300, posx+200)
+        randy = random.randrange(0, 100) - 50
         rand_rad = random.randrange(5, 30)
         rand_speedx = random.randrange(10, 30) / 10
         rand_speedy = random.randrange(10, 30) / 10
@@ -1748,6 +1770,11 @@ def level_2():
             displayanimtext('reaching there. If you find the planet habitable drop the rover, and base station and send', (110, 43))
             displayanimtext('SOS signal. Keep the hope alive.', (110, 44))
             displayanimtext('Press ENTER to continue', (700, 45.5))
+            arrow_img, arrow_rect = load_image("arrow.png",20,20,-1)
+            arrow_rect.center = (target_planet.rect.centerx, target_planet.rect.centery+85)
+            screen.blit(arrow_img,arrow_rect)
+            pygame.display.update()
+            displaycustomanimtext('Target Planet',(target_planet.pos.x - 80, 37.5), "Sprites/ethnocentric.otf", 15, yellow)
             intro_printing.stop()
 
             while showintro:
@@ -1943,6 +1970,11 @@ def level_3():
                 (115, 43))
             displayanimtext('in the path, the biggest in the milky way. Avoid going near it.', (115, 44))
             displayanimtext('Press ENTER to continue', (700, 45))
+            arrow_img, arrow_rect = load_image("arrow.png",20,20,-1)
+            arrow_rect.center = (target_planet.rect.centerx, target_planet.rect.centery+60)
+            screen.blit(arrow_img,arrow_rect)
+            pygame.display.update()
+            displaycustomanimtext('Target Planet',(target_planet.pos.x - 80, 36), "Sprites/ethnocentric.otf", 15, yellow)
             intro_printing.stop()
 
             while showintro:
@@ -2167,6 +2199,11 @@ def level_4():
             displayanimtext('Our previous team almost reached Solaris but was pulled due to the strong magnetic fields', (115, 43))
             displayanimtext('fields at the other end of the wormhole, so be careful. Hoping to reach without collision.', (115, 44))
             displayanimtext('Press ENTER to continue', (700, 45.5))
+            arrow_img, arrow_rect = load_image("arrow.png",20,20,-1)
+            arrow_rect.center = (target_planet.rect.centerx, target_planet.rect.centery+85)
+            screen.blit(arrow_img,arrow_rect)
+            pygame.display.update()
+            displaycustomanimtext('Target Planet',(target_planet.pos.x - 80, 37.5), "Sprites/ethnocentric.otf", 15, yellow)
             intro_printing.stop()
 
             while showintro:
@@ -2259,8 +2296,8 @@ def level_5():
     player.gameOver = False
     player.angle_speed = 90
     player.rotate()
-    player.fuel = 150
-    player.maxfuel = 150
+    player.fuel = 100
+    player.maxfuel = 100
     starfield1 = stars(1, (150, 150, 150), 75, 0.5)
     starfield2 = stars(1, (75, 75, 75), 200, 1)
     player.speed_vec = vec(0, 0)
@@ -2459,7 +2496,7 @@ def level_5():
 
     image, rect = load_image(join("Spaceship", files[6]), 150,
                                          170, -1)
-    ship = Ship(image, rect, (5200, 250), 0, 200, translate=True)
+    ship = Ship(image, rect, (5200, 200), 0, 200, translate=True)
     shipGroup.add(ship)
 
     image, rect = load_image(join("Spaceship", files[7]), 50,
@@ -2687,13 +2724,48 @@ def level_5():
 
         if showintro:
             pygame.display.update()
-            # offset(500, planetGroup, wormholeGroup, meteorGroup, blackholeGroup, asteroidGroup, target_planet, player)
+
+            screen.fill((0, 0, 0))
+            starfield1.drawstars()
+            starfield2.drawstars()
+            offset(4500,
+                   planetGroup, wormholeGroup, meteorGroup,
+                   blackholeGroup, asteroidGroup, target_planet, shipGroup,
+                   player, True)
+
+            target_planet.update()
+            planetGroup.update()
+            planetGroup.draw(screen)
+            asteroidGroup.update()
+            asteroidGroup.draw(screen)
+            wormholeGroup.update()
+            wormholeGroup.draw(screen)
+            meteorGroup.update()
+            meteorGroup.draw(screen)
+            blackholeGroup.update()
+            blackholeGroup.draw(screen)
+            shipGroup.update()
+            shipGroup.draw(screen)
+            player.update()
             pygame.display.update()
+            arrow_img, arrow_rect = load_image("arrow.png", 20, 20, -1)
+            arrow_img = pygame.transform.rotate(arrow_img, 180)
+            arrow_rect = arrow_img.get_rect(center=arrow_rect.center)
+            arrow_rect.center = (695, 340)
+            screen.blit(arrow_img, arrow_rect)
+            displaycustomanimtext('Target Planet',
+                                  (target_planet.pos.x - 90, 19),
+                                  "Sprites/ethnocentric.otf", 15, yellow)
+            pygame.display.update()
+            pygame.time.wait(1000)
+
             border = pygame.Rect((50, height - 185), (width - 100, 165))
             textbox = pygame.Rect((50, height - 185), (width - 100, 165))
             pygame.draw.rect(screen, black, textbox, border_radius=12)
             pygame.draw.rect(screen, green, border, 2, border_radius=12)
             pygame.display.update()
+
+
             if setting_sound_effects:
                 intro_printing.play(-1)
             displayanimtext('TARS:', (60, 37))
@@ -2708,6 +2780,7 @@ def level_5():
             displayanimtext('spaceships. The remaining spaceships will follow you. You can make history by escorting', (115, 43))
             displayanimtext('the whole human civilization to another planet that is never done before.', (115, 44))
             displayanimtext('Press ENTER to continue', (700, 45.5))
+
             intro_printing.stop()
 
             while showintro:
@@ -2718,6 +2791,11 @@ def level_5():
                             meteor_time = pygame.time.get_ticks()
                             if setting_music:
                                 final_lvl_music.play(-1)
+                                offset(-4500,
+                                       planetGroup, wormholeGroup, meteorGroup,
+                                       blackholeGroup, asteroidGroup,
+                                       target_planet, shipGroup,
+                                       player, True)
 
         if meteor_time:
             time_since_enter = pygame.time.get_ticks() - meteor_time
@@ -2798,18 +2876,24 @@ def game_over():
                 pygame.quit()
                 quit()
             if event.type == pygame.KEYDOWN:
-                if setting_sound_effects:
-                    menu_select.play()
                 if event.key == pygame.K_LEFT:
+                    if setting_sound_effects:
+                        menu_select.play()
                     selected -= 1
                 elif event.key == pygame.K_RIGHT:
+                    if setting_sound_effects:
+                        menu_select.play()
                     selected += 1
                 elif event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
+                    if setting_sound_effects:
+                        menu_select.play()
                     mainmenu = True
                     gameovermenu = False
                     main_menu()
 
                 if event.key == pygame.K_RETURN:
+                    if setting_sound_effects:
+                        menu_select.play()
                     if selected == 0:
                         gameovermenu = False
                         running = True
@@ -2869,18 +2953,24 @@ def lvl_finished():
                 pygame.quit()
                 quit()
             if event.type == pygame.KEYDOWN:
-                if setting_sound_effects:
-                    menu_select.play()
                 if event.key == pygame.K_LEFT:
+                    if setting_sound_effects:
+                        menu_select.play()
                     selected -= 1
                 elif event.key == pygame.K_RIGHT:
+                    if setting_sound_effects:
+                        menu_select.play()
                     selected += 1
                 elif event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE:
+                    if setting_sound_effects:
+                        menu_select.play()
                     mainmenu = True
                     lvlfinishmenu = False
                     main_menu()
 
                 if event.key == pygame.K_RETURN:
+                    if setting_sound_effects:
+                        menu_select.play()
                     if selected == 0:
                         lvlfinishmenu = False
                         running = True
@@ -2970,10 +3060,9 @@ def game_finished():
                 gamefinishscreen = False
                 main_menu()
             if event.type == pygame.KEYDOWN:
-                if setting_sound_effects:
-                    menu_select.play()
-
                 if event.key == pygame.K_ESCAPE or event.key == pygame.K_BACKSPACE or event.key == pygame.K_RETURN:
+                    if setting_sound_effects:
+                        menu_select.play()
                     mainmenu = True
                     gamefinishscreen = False
                     main_menu()
@@ -3016,6 +3105,8 @@ def game_finished():
                 for event in pygame.event.get():
                     if event.type == KEYDOWN:
                         if event.key == K_RETURN:
+                            if setting_sound_effects:
+                                menu_select.play()
                             show_finish_desc = False
                             show_final_message = True
 
@@ -3060,6 +3151,8 @@ def game_finished():
                 for event in pygame.event.get():
                     if event.type == KEYDOWN:
                         if event.key == K_RETURN:
+                            if setting_sound_effects:
+                                menu_select.play()
                             show_final_message = False
                             mainmenu = True
                             gamefinishscreen = False

@@ -643,6 +643,8 @@ class Player(pygame.sprite.Sprite):
             if setting_sound_effects:
                 thrust_on.play()
         if keys[K_ESCAPE]:
+            lvl_music.stop()
+            final_lvl_music.stop()
             self.gameOver = True
             global gameovermenu
             gameovermenu = True

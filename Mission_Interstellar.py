@@ -54,7 +54,7 @@ blackhole_effect = pygame.mixer.Sound('Sprites/Sound Effects/blackhole.wav')
 blackhole_effect.set_volume(0.5)
 thrust_on = pygame.mixer.Sound('Sprites/Sound Effects/rocket on.wav')
 thrust_on.set_volume(0.1)
-explosion_effect = pygame.mixer.Sound('Sprites/explosion.wav')
+explosion_effect = pygame.mixer.Sound('Sprites/Sound Effects/explosion.wav')
 explosion_effect.set_volume(0.5)
 lvl_complete_effect = pygame.mixer.Sound(
     'Sprites/Sound Effects/lvl_complete.wav')
@@ -338,6 +338,7 @@ class BlackHole(pygame.sprite.Sprite):
 
         screen.blit(self.image, self.rect)
 
+
 class WormHole(pygame.sprite.Sprite):
 
     def __init__(self, pos, angle, radius, translate=False):
@@ -417,7 +418,7 @@ class Meteor(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)
         self.pos = vec(pos)
         self.speed = speed
-        self.explosion_sound = pygame.mixer.Sound('Sprites/explosion.wav')
+        self.explosion_sound = pygame.mixer.Sound('Sprites/Sound Effects/explosion.wav')
         self.explosion_sound.set_volume(0.1)
         self.initial_pos = pos
 
@@ -470,13 +471,8 @@ class Explosion(pygame.sprite.Sprite):
 
             self.images.append(image)
 
-        print("len(self.images)")
-        print(len(self.images))
-
         self.image = self.images[0]
         self.index = 0
-        print("self.index")
-        print(self.index)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         screen.blit(self.image, self.rect)
@@ -486,10 +482,6 @@ class Explosion(pygame.sprite.Sprite):
         self.image = self.images[self.index]
         screen.blit(self.image, self.rect)
         pygame.display.update()
-        print("self.index")
-        print(self.index)
-        print("len(self.images)")
-        print(len(self.images))
         if self.index + 1 >= len(self.images):
             self.index = 0
         else:
@@ -543,7 +535,6 @@ class Player(pygame.sprite.Sprite):
 
         (self.image, self.rect) = load_image('ship.png', 40,
                                              40, -1)
-        # self.image = pygame.Surface((40, 40), pygame.SRCALPHA)
         self.original_image = self.image
         self.position = vec(pos)
         self.rect = self.image.get_rect(center=self.position)
@@ -556,7 +547,7 @@ class Player(pygame.sprite.Sprite):
         self.maxfuel = 0
         self.gameOver = False
         self.throughWormhole = False
-        self.explosion_sound = pygame.mixer.Sound('Sprites/explosion.wav')
+        self.explosion_sound = pygame.mixer.Sound('Sprites/Sound Effects/explosion.wav')
         self.explosion_sound.set_volume(0.1)
         self.flame_up = flame(40, 80, self, 1)
         self.flame_down = flame(40, 80, self, 4)
@@ -666,7 +657,6 @@ class Player(pygame.sprite.Sprite):
 
     def explode(self, blackhole=False):
         (x, y) = self.rect.center
-        # if pygame.mixer.get_init():
         lvl_music.stop()
         final_lvl_music.stop()
         if setting_sound_effects:
@@ -845,7 +835,7 @@ def main_menu():
             color3 = yellow
             color4 = white
 
-        main_img, main_rect = load_image("mission-interstellar-01.png", 800,
+        main_img, main_rect = load_image("mission-interstellar.png", 800,
                                          400, -1)
         main_rect.center = (screen.get_width() / 2, 200)
         screen.blit(main_img, main_rect)
@@ -1196,7 +1186,7 @@ def level_menu():
             color4 = yellow
             color5 = white
 
-        main_img, main_rect = load_image("mission-interstellar-01.png", 800,
+        main_img, main_rect = load_image("mission-interstellar.png", 800,
                                          400, -1)
         main_rect.center = (screen.get_width() / 2, 200)
         screen.blit(main_img, main_rect)

@@ -1000,14 +1000,14 @@ def howtoplay():
             'Turning requires minimum fuel while brakes require maximum fuel.',
             24, screen.get_width() / 2,
                 ship_rect.top + 60, yellow)
-        displaytext('If fuel of Spaceship gets empty, player is out.', 24,
+        displaytext('If the fuel of Spaceship gets empty, the player is out.', 24,
                     screen.get_width() / 2,
                     ship_rect.top + 90, yellow)
 
         displaymenutext('Planets', 25, screen.get_width() / 2,
                         planet_rect.top - 50, white)
         displaytext(
-            'Planets vary in different radius and surface types but all planets possess ',
+            'Planets vary in different radius and surface types and all planets possess ',
             24, screen.get_width() / 2,
                 planet_rect.top + 30, yellow)
         displaytext(
@@ -1021,13 +1021,13 @@ def howtoplay():
         displaymenutext('Asteroids', 25, screen.get_width() / 2,
                         asteroid_rect.top - 50, white)
         displaytext(
-            'Asteroids revolve around planets and blackholes vary. Asteroids vary',
+            'Asteroids revolve around planets and blackholes. Asteroids vary',
             24, screen.get_width() / 2, asteroid_rect.top + 30, yellow)
         displaytext(
             'in different radius, surface types and speed of revolution but asteroids can',
             24, screen.get_width() / 2, asteroid_rect.top + 60, yellow)
         displaytext(
-            ' destroy the spaceship on collision. So avoid going near them',
+            ' destroy the spaceship on collision. So avoid going near them.',
             24, screen.get_width() / 2, asteroid_rect.top + 90, yellow)
 
         displaymenutext('Meteors', 25, screen.get_width() / 2,
@@ -1052,11 +1052,11 @@ def howtoplay():
             'Blackholes have big radius of gravity and can pull the spaceship ',
             24, screen.get_width() / 2, blackhole_rect.top + 50, yellow)
         displaytext(
-            'from large distance. Once pulled in spaceship cannot',
+            'from large distance. Once pulled in, spaceship cannot',
             24, screen.get_width() / 2, blackhole_rect.top + 80,
             yellow)
         displaytext(
-            'escape from blackhole',
+            'escape from blackhole.',
             24, screen.get_width() / 2, blackhole_rect.top + 110,
             yellow)
 
@@ -1069,7 +1069,7 @@ def howtoplay():
             'It provides a shortcut by shorter path. It can be used to reach',
             24, screen.get_width() / 2, wormhole_rect.top + 60, yellow)
         displaytext(
-            'some other point in space without using fuel',
+            'some other point in space without using fuel.',
             24, screen.get_width() / 2, wormhole_rect.top + 90,
             yellow)
 

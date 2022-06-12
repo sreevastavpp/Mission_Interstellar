@@ -1083,8 +1083,7 @@ def howtoplay():
         else:
             scroll_down = True
 
-        print(ship_rect.top)
-        if ship_rect.top > 50:
+        if ship_rect.top > 100:
             scroll_up = False
         else:
             scroll_up = True

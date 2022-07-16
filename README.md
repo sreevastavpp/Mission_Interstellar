@@ -16,6 +16,13 @@ pip install pygame
 command from the terminal from the project folder location.
 python Mission_Interstellar.py
 
+## Player Controls
+- Press **UP** arrow key to move forward
+- Press **DOWN** arrow key to move backward
+- Press **Left** arrow key to turn left
+- Press **Right** arrow key to turn right
+- Press **SPACE** key for emergency brakes
+
 ## Screenshots
 
 ### Main Screen

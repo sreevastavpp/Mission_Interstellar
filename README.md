@@ -1,5 +1,11 @@
 # Mission_Interstellar
 
+## Table of Contents
+- [Abstract](#abstract)
+- [Steps to play the game](#steps-to-play-the-game)
+- [Player Controls](#player-controls)
+- [Screenshots](#screenshots)
+
 ## Abstract
 Mission Interstellar is a 2D game based on a spaceship that needs to rehabilitate human
 civilization to another habitable planet as the earth is no more habitable for humans. In this

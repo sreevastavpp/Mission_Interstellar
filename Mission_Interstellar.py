@@ -848,8 +848,6 @@ def main_menu():
 
         displaytext('Mission Intersteller 1.0', 12, width - 80, height - 20,
                     white)
-        displaytext('Made by: Vatsal Patel', 12, width - 80, height - 10,
-                    white)
 
         speed_vec = vec(0, -1)
         pygame.display.update()
@@ -903,8 +901,6 @@ def settings():
                         white)
 
         displaytext('Mission Intersteller 1.0', 12, width - 80, height - 20,
-                    white)
-        displaytext('Made by: Vatsal Patel', 12, width - 80, height - 10,
                     white)
 
         speed_vec = vec(0, -1)
@@ -1075,8 +1071,6 @@ def howtoplay():
 
         displaytext('Mission Intersteller 1.0', 12, width - 80, height - 20,
                     white)
-        displaytext('Made by: Vatsal Patel', 12, width - 80, height - 10,
-                    white)
 
         if screen.get_height() - wormhole_rect.bottom > 50:
             scroll_down = False
@@ -1093,11 +1087,11 @@ def howtoplay():
 
 
 def level_menu():
-    color1 = white
-    color2 = yellow
-    color3 = yellow
-    color4 = yellow
-    color5 = yellow
+    color1 = yellow
+    # color2 = yellow
+    # color3 = yellow
+    # color4 = yellow
+    # color5 = yellow
 
     starfield1 = stars(1, (150, 150, 150), 75, 0.5)
     starfield2 = stars(1, (75, 75, 75), 200, 1)
@@ -1137,53 +1131,53 @@ def level_menu():
                     currentLvl = selected
                     if selected == 0:
                         level_1()
-                    if selected == 1:
-                        level_2()
-                    if selected == 2:
-                        level_3()
-                    if selected == 3:
-                        level_4()
-                    if selected == 4:
-                        level_5()
+                    # if selected == 1:
+                    #     level_2()
+                    # if selected == 2:
+                    #     level_3()
+                    # if selected == 3:
+                    #     level_4()
+                    # if selected == 4:
+                    #     level_5()
 
         screen.fill((0, 0, 0))
         starfield1.drawstars()
         starfield2.drawstars()
-        if selected > 4:
+        if selected > 1:
             selected = 0
         if selected < 0:
-            selected = 4
+            selected = 0
 
         if (selected == 0):
             color1 = white
-            color2 = yellow
-            color3 = yellow
-            color4 = yellow
-            color5 = yellow
-        elif (selected == 1):
-            color1 = yellow
-            color2 = white
-            color3 = yellow
-            color4 = yellow
-            color5 = yellow
-        elif (selected == 2):
-            color1 = yellow
-            color2 = yellow
-            color3 = white
-            color4 = yellow
-            color5 = yellow
-        elif (selected == 3):
-            color1 = yellow
-            color2 = yellow
-            color3 = yellow
-            color4 = white
-            color5 = yellow
-        elif (selected == 4):
-            color1 = yellow
-            color2 = yellow
-            color3 = yellow
-            color4 = yellow
-            color5 = white
+            # color2 = yellow
+            # color3 = yellow
+            # color4 = yellow
+            # color5 = yellow
+        # elif (selected == 1):
+        #     color1 = yellow
+        #     color2 = white
+        #     color3 = yellow
+        #     color4 = yellow
+        #     color5 = yellow
+        # elif (selected == 2):
+        #     color1 = yellow
+        #     color2 = yellow
+        #     color3 = white
+        #     color4 = yellow
+        #     color5 = yellow
+        # elif (selected == 3):
+        #     color1 = yellow
+        #     color2 = yellow
+        #     color3 = yellow
+        #     color4 = white
+        #     color5 = yellow
+        # elif (selected == 4):
+        #     color1 = yellow
+        #     color2 = yellow
+        #     color3 = yellow
+        #     color4 = yellow
+        #     color5 = white
 
         main_img, main_rect = load_image("mission-interstellar.png", 800,
                                          400, -1)
@@ -1191,14 +1185,12 @@ def level_menu():
         screen.blit(main_img, main_rect)
 
         displaymenutext('Level 1', 25, width / 2 - 20, height - 350, color1)
-        displaymenutext('Level 2', 25, width / 2 - 20, height - 275, color2)
-        displaymenutext('Level 3', 25, width / 2 - 20, height - 200, color3)
-        displaymenutext('Level 4', 25, width / 2 - 20, height - 125, color4)
-        displaymenutext('Level 5', 25, width / 2 - 20, height - 50, color5)
+        # displaymenutext('Level 2', 25, width / 2 - 20, height - 275, color2)
+        # displaymenutext('Level 3', 25, width / 2 - 20, height - 200, color3)
+        # displaymenutext('Level 4', 25, width / 2 - 20, height - 125, color4)
+        # displaymenutext('Level 5', 25, width / 2 - 20, height - 50, color5)
 
         displaytext('Mission Intersteller 1.0', 12, width - 80, height - 20,
-                    white)
-        displaytext('Made by: Vatsal Patel', 12, width - 80, height - 10,
                     white)
 
         speed_vec = vec(0, -1)
@@ -2643,8 +2635,6 @@ def game_over():
                         color2)
         displaytext('Mission Intersteller 1.0', 12, width - 80, height - 40,
                     white)
-        displaytext('Made by: Vatsal Patel', 12, width - 80, height - 20,
-                    white)
 
         speed_vec = vec(0, -1)
         pygame.display.update()
@@ -2731,8 +2721,6 @@ def lvl_finished():
         displaymenutext('Main Menu', 25, 2 * width / 3 + 20, height - 400,
                         color2)
         displaytext('Mission Intersteller 1.0', 12, width - 80, height - 40,
-                    white)
-        displaytext('Made by: Vatsal Patel', 12, width - 80, height - 20,
                     white)
 
         speed_vec = vec(0, -1)
@@ -2829,8 +2817,7 @@ def game_finished():
             displaytext('Mission Intersteller 1.0', 12, width - 80,
                         height - 40,
                         white)
-            displaytext('Made by: Vatsal Patel', 12, width - 80, height - 30,
-                        white)
+            
             pygame.display.update()
 
             intro_printing.stop()
@@ -2864,10 +2851,10 @@ def game_finished():
                 "This game is based on fiction and hoping that you enjoyed playing it.",
                 (100, 15), "Sprites/ethnocentric.otf", 15, white)
             displaycustomanimtext(
-                "But the reason for developing this game is to bring awareness to youth,",
+                "But the reason for developing this game is to bring awareness,",
                 (80, 16.5), "Sprites/ethnocentric.otf", 15, white)
             displaycustomanimtext(
-                "as youth is the future. This fiction is slowly turning into reality on",
+                "This fiction is slowly turning into reality on",
                 (100, 18), "Sprites/ethnocentric.otf", 15, white)
             displaycustomanimtext(
                 "Earth. With every passing day, thousands of trees are being cut down,",
@@ -2898,8 +2885,6 @@ def game_finished():
             displaytext('Mission Intersteller 1.0', 12, width - 80,
                         height - 40,
                         white)
-            displaytext('Made by: Vatsal Patel', 12, width - 80, height - 30,
-                        white)
             slide_time = pygame.time.get_ticks()
             pygame.display.update()
 
@@ -2922,8 +2907,6 @@ def game_finished():
 
             displaytext('Mission Intersteller 1.0', 12, width - 80,
                         height - 40,
-                        white)
-            displaytext('Made by: Vatsal Patel', 12, width - 80, height - 20,
                         white)
             pygame.display.update()
 

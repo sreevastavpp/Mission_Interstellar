@@ -2666,6 +2666,10 @@ def lvl_finished():
     global gamefinishscreen
     selected = 0
 
+    lvlfinishmenu = False
+    gamefinishscreen = True
+    game_finished()
+
     while lvlfinishmenu:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
